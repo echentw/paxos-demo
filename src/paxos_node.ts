@@ -1,119 +1,125 @@
-interface MessageBase {
-  kind: string;
-  toNode: PaxosNode;
-  fromNode: PaxosNode;
-}
+import {
+  PrepareStageRequest,
+  PrepareStageResponse,
+  AcceptStageRequest,
+  AcceptStageResponse,
+  Message,
+} from './message';
 
-interface PrepareStageRequest extends MessageBase {
-  kind: 'PrepareStageRequest';
-  proposalNumber: number;
-}
+import { Proposer, Receiver } from './roles';
 
-interface PrepareStageResponse extends MessageBase {
-  kind: 'PrepareStageResponse',
-  accepted: boolean;
-  highestProposalNumber: number;
-  value: string | null;
-}
+export class PaxosNode {
+  private proposer: Proposer;
+  private receiver: Receiver;
 
-interface AcceptStageRequest extends MessageBase {
-  kind: 'AcceptStageRequest',
-  proposalNumber: number;
-  value: string;
-}
-
-type Message = PrepareStageRequest | PrepareStageResponse | AcceptStageRequest;
-
-
-class PaxosNode {
-  private proposalNumber: number;
-  private value: string;
   private nodeList: Array<PaxosNode>;
 
-  private getNewProposalNumber: (proposalNumber: number) => number;
-
-  // Phase 1
-  private numNodesAcceptedProposal: number;
-
   constructor(id: number, numNodes: number) {
-    this.proposalNumber = 0;
-    this.nodeList = [this];
+    this.proposer = new Proposer(id, numNodes);
+    this.receiver = new Receiver();
 
-    this.getNewProposalNumber = (proposalNumber: number) => {
-      return (Math.floor(proposalNumber / numNodes) + 1) * numNodes + id;
-    };
+    this.nodeList = [this];
   }
 
-  initiateProposal(value: string) {
-    this.numNodesAcceptedProposal = 1;
-    this.value = value;
-    this.proposalNumber = this.getNewProposalNumber(this.proposalNumber);
-    this.nodeList.forEach((node: PaxosNode) => {
-      const message: PrepareStageRequest = {
-        kind: 'PrepareStageRequest',
-        toNode: node,
-        fromNode: this,
-        proposalNumber: this.proposalNumber,
-      };
-      // TODO: send message to node
+  initializeNodeList(nodeList: Array<PaxosNode>): void {
+    this.nodeList = nodeList;
+  }
+
+  // Phase 1 proposer
+  sendPrepareRequest(value: string): void {
+    this.proposer.proposalNumber = this.proposer.getNewProposalNumber(this.receiver.highestSeenProposalNumber);
+    this.proposer.proposedValue = value;
+    this.proposer.responses = [];
+    this.proposer.isProposing = true;
+
+    this.proposer.responses.push({
+      kind: 'PrepareStageResponse',
+      toNode: this,
+      fromNode: this,
+      proposalNumber: this.receiver.highestSeenProposalNumber,
+      value: this.receiver.acceptedValue,
+    });
+
+    this.receiver.highestSeenProposalNumber = this.proposer.proposalNumber;
+
+    this.nodeList.forEach((node: PaxosNode): void => {
+      if (node !== this) {
+        const message: PrepareStageRequest = {
+          kind: 'PrepareStageRequest',
+          toNode: node,
+          fromNode: this,
+          proposalNumber: this.proposer.proposalNumber,
+        };
+        // TODO: send the message
+        // ...
+      }
     });
   }
 
-  receiveMessage(message: Message): void {
-    if (message.kind === 'PrepareStageRequest') {
-      if (this.proposalNumber > message.proposalNumber) {
-        const response: PrepareStageResponse = {
-          kind: 'PrepareStageResponse',
-          toNode: message.fromNode,
-          fromNode: this,
-          accepted: false,
-          highestProposalNumber: this.proposalNumber,
-          value: this.value,
-        };
-        // TODO: send message back to node
-      } else if (this.proposalNumber < message.proposalNumber) {
-        this.proposalNumber = message.proposalNumber;
-        const response: PrepareStageResponse = {
-          kind: 'PrepareStageResponse',
-          toNode: message.fromNode,
-          fromNode: this,
-          accepted: false,
-          highestProposalNumber: message.proposalNumber,
-          value: null,
-        };
-        // TODO: send message back to node
+  // Phase 1 proposer
+  receivePrepareResponse(message: PrepareStageResponse): void {
+    if (!this.proposer.isProposing) {
+      return;
+    }
+
+    this.proposer.responses.push(message);
+
+    if (this.proposer.responses.length > this.nodeList.length / 2) {
+      const importantMessage = this.proposer.responses.reduce((prevMessage, nextMessage) => {
+        return prevMessage.proposalNumber > nextMessage.proposalNumber ? prevMessage : nextMessage;
+      });
+      const { proposalNumber, value } = importantMessage;
+
+      if (proposalNumber > this.proposer.proposalNumber) {
+        this.proposer.isProposing = false;
       } else {
-        throw new Error('Received a PrepareStageRequest with an already seen proposal number.');
+        if (value !== null) {
+          this.proposer.proposedValue = value;
+          // TODO: send accept request to all the nodes
+          // ...
+        }
       }
-    } else if (message.kind === 'PrepareStageResponse') {
-      if (message.accepted) {
-        this.numNodesAcceptedProposal += 1;
-      } else {
-        this.value = message.value;
-        this.proposalNumber = message.highestProposalNumber;
-      }
-    } else if (message.kind === 'AcceptStageRequest') {
-      if (this.proposalNumber <= message.proposalNumber) {
-        this.proposalNumber = message.proposalNumber;
-        this.value = message.value;
-      } else {
-        // TODO: Can we ignore here?
-      }
-    } else {
-      throw new Error('Message received is not a message.');
     }
   }
 
-  setNodeList(nodeList) {
-    this.nodeList = nodeList;
+  // Phase 2 proposer
+  sendAcceptRequest(): void {
+    this.nodeList.forEach((node: PaxosNode): void => {
+      const message: AcceptStageRequest = {
+        kind: 'AcceptStageRequest',
+        toNode: node,
+        fromNode: this,
+        proposalNumber: this.proposer.proposalNumber,
+        value: this.proposer.proposedValue,
+      };
+      // TODO: send message
+      // ...
+    });
+  }
+
+  // Phase 1 receiver
+  receivePrepareRequest(message: PrepareStageRequest): void {
+    const response: PrepareStageResponse = {
+      kind: 'PrepareStageResponse',
+      toNode: message.fromNode,
+      fromNode: this,
+      proposalNumber: this.receiver.highestSeenProposalNumber,
+      value: this.receiver.acceptedValue,
+    };
+    // TODO: send response
+    // ...
+
+    if (message.proposalNumber > this.receiver.highestSeenProposalNumber) {
+      this.receiver.highestSeenProposalNumber = message.proposalNumber;
+      this.receiver.acceptedValue = null;
+    }
+  }
+
+  // Phase 2 receiver
+  receiveAcceptRequest(message: AcceptStageRequest): void {
+    if (message.proposalNumber >= this.receiver.highestSeenProposalNumber) {
+      this.receiver.highestSeenProposalNumber = message.proposalNumber;
+      this.receiver.acceptedValue = message.value;
+    }
   }
 }
-
-const message: PrepareStageRequest = {
-  kind: 'PrepareStageRequest',
-  toNode: new PaxosNode(0, 5),
-  fromNode: new PaxosNode(1, 5),
-  proposalNumber: 12,
-}
-
-console.log(typeof message);
