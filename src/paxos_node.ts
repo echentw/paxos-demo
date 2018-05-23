@@ -75,9 +75,8 @@ export class PaxosNode {
       } else {
         if (value !== null) {
           this.proposer.proposedValue = value;
-          // TODO: send accept request to all the nodes
-          // ...
         }
+        this.sendAcceptRequest();
       }
     }
   }
