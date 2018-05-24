@@ -6,25 +6,52 @@ import {
   Message,
 } from './message';
 
+import { MessagePool } from './message_pool';
+
 import { Proposer, Receiver, Learner } from './roles';
+
 
 export class PaxosNode {
   private proposer: Proposer;
   private receiver: Receiver;
   private learner: Learner;
 
+  private messagePool: MessagePool;
+
   private nodeList: Array<PaxosNode>;
 
-  constructor(id: number, numNodes: number) {
+  constructor(messagePool: MessagePool, id: number, numNodes: number) {
     this.proposer = new Proposer(id, numNodes);
     this.receiver = new Receiver();
     this.learner = new Learner();
 
+    this.messagePool = messagePool;
     this.nodeList = [this];
   }
 
   initializeNodeList(nodeList: Array<PaxosNode>): void {
     this.nodeList = nodeList;
+  }
+
+  receiveMessage(message: Message): void {
+    switch(message.kind) {
+      case 'PrepareStageRequest': {
+        this.receivePrepareRequest(message);
+        break;
+      }
+      case 'PrepareStageResponse': {
+        this.receivePrepareResponse(message);
+        break;
+      }
+      case 'AcceptStageRequest': {
+        this.receiveAcceptRequest(message);
+        break;
+      }
+      case 'AcceptStageResponse': {
+        this.receiveAcceptResponse(message);
+        break;
+      }
+    }
   }
 
   // Phase 1 proposer
@@ -54,8 +81,7 @@ export class PaxosNode {
           fromNode: this,
           proposalNumber: this.proposer.proposalNumber,
         };
-        // TODO: send the message
-        // ...
+        this.messagePool.addMessage(message);
       }
     });
   }
@@ -95,8 +121,7 @@ export class PaxosNode {
         proposalNumber: this.proposer.proposalNumber,
         value: this.proposer.proposedValue,
       };
-      // TODO: send message
-      // ...
+      this.messagePool.addMessage(message);
     });
   }
 
@@ -109,8 +134,7 @@ export class PaxosNode {
       proposalNumber: this.receiver.highestSeenProposalNumber,
       value: this.receiver.acceptedValue,
     };
-    // TODO: send response
-    // ...
+    this.messagePool.addMessage(response);
 
     if (message.proposalNumber > this.receiver.highestSeenProposalNumber) {
       this.receiver.highestSeenProposalNumber = message.proposalNumber;

@@ -1,6 +1,7 @@
 import { Message } from './message';
+import { PaxosNode } from './paxos_node';
 
-class MessagePool {
+export class MessagePool {
   private messagesById: Map<string, Message>;
 
   constructor() {
@@ -16,7 +17,17 @@ class MessagePool {
     this.messagesById.set(id, message);
   }
 
-  removeMessage(id: string): void {
+  deliverMessage(id: string): void {
+    const message = this.messagesById.get(id);
+    this.messagesById.delete(id);
+
+    if (message) {
+      const receiverNode: PaxosNode = message.toNode;
+      receiverNode.receiveMessage(message);
+    }
+  }
+
+  dropMessage(id: string): void {
     this.messagesById.delete(id);
   }
 }
