@@ -22,6 +22,9 @@ export class Proposer {
   }
 
   getNewProposalNumber(highestSeenProposalNumber: number): number {
+    if (!highestSeenProposalNumber) {
+      highestSeenProposalNumber = 0;
+    }
     return (Math.floor(highestSeenProposalNumber / this.numNodes) + 1) * this.numNodes + this.id;
   }
 }

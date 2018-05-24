@@ -2,7 +2,7 @@ import { Message } from './message';
 import { PaxosNode } from './paxos_node';
 
 export class MessagePool {
-  private messagesById: Map<string, Message>;
+  public messagesById: Map<string, Message>;
 
   constructor() {
     this.messagesById = new Map<string, Message>();
@@ -29,5 +29,9 @@ export class MessagePool {
 
   dropMessage(id: string): void {
     this.messagesById.delete(id);
+  }
+
+  clear(): void {
+    this.messagesById.clear();
   }
 }

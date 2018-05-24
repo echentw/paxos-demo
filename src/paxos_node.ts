@@ -136,7 +136,8 @@ export class PaxosNode {
     };
     this.messagePool.addMessage(response);
 
-    if (message.proposalNumber > this.receiver.highestSeenProposalNumber) {
+    if (!this.receiver.highestSeenProposalNumber ||
+        message.proposalNumber > this.receiver.highestSeenProposalNumber) {
       this.receiver.highestSeenProposalNumber = message.proposalNumber;
       this.receiver.acceptedValue = null;
     }
