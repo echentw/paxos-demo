@@ -29,7 +29,9 @@ export class Proposer {
 export class Receiver {
   public highestSeenProposalNumber: number;
   public acceptedValue: string | null;
+}
 
-  constructor() {
-  }
+export class Learner {
+  public countsByChosenValue: Map<string, number>;
+  public chosenValue: string | null;
 }

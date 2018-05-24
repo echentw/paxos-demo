@@ -28,4 +28,4 @@ export interface AcceptStageResponse extends MessageBase {
   proposalNumber: number
 }
 
-export type Message = PrepareStageRequest | PrepareStageResponse | AcceptStageRequest;
+export type Message = PrepareStageRequest | PrepareStageResponse | AcceptStageRequest | AcceptStageResponse;

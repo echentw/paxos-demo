@@ -6,17 +6,19 @@ import {
   Message,
 } from './message';
 
-import { Proposer, Receiver } from './roles';
+import { Proposer, Receiver, Learner } from './roles';
 
 export class PaxosNode {
   private proposer: Proposer;
   private receiver: Receiver;
+  private learner: Learner;
 
   private nodeList: Array<PaxosNode>;
 
   constructor(id: number, numNodes: number) {
     this.proposer = new Proposer(id, numNodes);
     this.receiver = new Receiver();
+    this.learner = new Learner();
 
     this.nodeList = [this];
   }
@@ -31,6 +33,8 @@ export class PaxosNode {
     this.proposer.proposedValue = value;
     this.proposer.responses = [];
     this.proposer.isProposing = true;
+
+    this.learner.countsByChosenValue = new Map<string, number>();
 
     this.proposer.responses.push({
       kind: 'PrepareStageResponse',
@@ -120,5 +124,10 @@ export class PaxosNode {
       this.receiver.highestSeenProposalNumber = message.proposalNumber;
       this.receiver.acceptedValue = message.value;
     }
+  }
+
+  // Phase 2 learner
+  receiveAcceptResponse(message: AcceptStageResponse): void {
+    // TODO: implement me!
   }
 }
