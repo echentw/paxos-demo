@@ -114,14 +114,16 @@ export class PaxosNode {
   // Phase 2 proposer
   sendAcceptRequest(): void {
     this.nodeList.forEach((node: PaxosNode): void => {
-      const message: AcceptStageRequest = {
-        kind: 'AcceptStageRequest',
-        toNode: node,
-        fromNode: this,
-        proposalNumber: this.proposer.proposalNumber,
-        value: this.proposer.proposedValue,
-      };
-      this.messagePool.addMessage(message);
+      if (node !== this) {
+        const message: AcceptStageRequest = {
+          kind: 'AcceptStageRequest',
+          toNode: node,
+          fromNode: this,
+          proposalNumber: this.proposer.proposalNumber,
+          value: this.proposer.proposedValue,
+        };
+        this.messagePool.addMessage(message);
+      }
     });
   }
 

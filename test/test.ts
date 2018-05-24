@@ -34,8 +34,13 @@ describe('PaxosNode', () => {
     done();
   });
 
-
   describe('Proposer', () => {
+    it('should send a prepare message to everyone', (done) => {
+      nodes[0].sendPrepareRequest('juicy juicy burger');
+      assert.equal(4, messagePool.messagesById.size);
+      done();
+    });
+
     it('should generate a new higher proposal number', (done) => {
       const message: PrepareStageRequest = {
         kind: 'PrepareStageRequest',
@@ -46,17 +51,37 @@ describe('PaxosNode', () => {
       nodes[0].receivePrepareRequest(message);
       messagePool.clear();
 
-      nodes[0].sendPrepareRequest('juicy juicy burger');
+      nodes[0].sendPrepareRequest('french fries');
       messagePool.messagesById.forEach((message: Message, id: string, map) => {
-        assert.equal(message.kind, 'PrepareStageRequest');
+        assert.equal('PrepareStageRequest', message.kind);
         assert(message.proposalNumber > 123);
       });
       done();
     });
 
-    it('should send a prepare message to everyone', (done) => {
-      nodes[0].sendPrepareRequest('wand');
-      assert.equal(messagePool.messagesById.size, 4);
+    it('should begin phase 2 after receiving from a majority', (done) => {
+      nodes[0].sendPrepareRequest('milkshake');
+      const requests = Array.from(messagePool.messagesById.values());
+      messagePool.clear();
+      assert.equal(4, requests.length);
+
+      [requests[0], requests[1]].forEach((request) => {
+        const receiver = request.toNode;
+        receiver.receiveMessage(request);
+      });
+
+      const responses = Array.from(messagePool.messagesById.values());
+      messagePool.clear();
+      assert.equal(2, responses.length);
+
+      assert.equal(0, messagePool.messagesById.size);
+
+      nodes[0].receiveMessage(responses[0]);
+      assert.equal(0, messagePool.messagesById.size);
+
+      nodes[0].receiveMessage(responses[1]);
+      assert.equal(4, messagePool.messagesById.size);
+
       done();
     });
   });
