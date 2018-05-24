@@ -5,11 +5,15 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc --watch"
+    "old-start": "tsc --watch",
+    "start": "webpack --config webpack.config.js --watch"
   },
   "author": "Eric Chen",
   "license": "MIT",
   "dependencies": {
-    "typescript": "^2.8.3"
+    "ts-loader": "^4.3.0",
+    "typescript": "^2.8.3",
+    "webpack": "^4.8.3",
+    "webpack-cli": "^2.1.4"
   }
 }
