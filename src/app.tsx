@@ -10,14 +10,16 @@ import { NodeClusterContainer } from './NodeClusterContainer';
 export class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-    const messagePool: MessagePool = new MessagePool();
+    const messagePool = new MessagePool();
     const nodes = [
-      new PaxosNode(messagePool, 0, 5),
-      new PaxosNode(messagePool, 1, 5),
-      new PaxosNode(messagePool, 2, 5),
-      new PaxosNode(messagePool, 3, 5),
-      new PaxosNode(messagePool, 4, 5),
+      new PaxosNode(0, 5),
+      new PaxosNode(1, 5),
+      new PaxosNode(2, 5),
+      new PaxosNode(3, 5),
+      new PaxosNode(4, 5),
     ];
+    nodes.forEach((node) => node.initializeNodeList(nodes));
+
     this.state = {
       messagePool: messagePool,
       nodes: nodes,

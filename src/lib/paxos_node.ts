@@ -6,8 +6,6 @@ import {
   Message,
 } from './message';
 
-import { MessagePool } from './message_pool';
-
 import { Proposer, Receiver, Learner } from './roles';
 
 
@@ -16,16 +14,13 @@ export class PaxosNode {
   private receiver: Receiver;
   private learner: Learner;
 
-  private messagePool: MessagePool;
-
   private nodeList: Array<PaxosNode>;
 
-  constructor(messagePool: MessagePool, id: number, numNodes: number) {
+  constructor(id: number, numNodes: number) {
     this.proposer = new Proposer(id, numNodes);
     this.receiver = new Receiver();
     this.learner = new Learner();
 
-    this.messagePool = messagePool;
     this.nodeList = [this];
   }
 
@@ -33,29 +28,25 @@ export class PaxosNode {
     this.nodeList = nodeList;
   }
 
-  receiveMessage(message: Message): void {
+  receiveMessage(message: Message): Array<Message> {
     switch(message.kind) {
       case 'PrepareStageRequest': {
-        this.receivePrepareRequest(message);
-        break;
+        return this.receivePrepareRequest(message);
       }
       case 'PrepareStageResponse': {
-        this.receivePrepareResponse(message);
-        break;
+        return this.receivePrepareResponse(message);
       }
       case 'AcceptStageRequest': {
-        this.receiveAcceptRequest(message);
-        break;
+        return this.receiveAcceptRequest(message);
       }
       case 'AcceptStageResponse': {
-        this.receiveAcceptResponse(message);
-        break;
+        return this.receiveAcceptResponse(message);
       }
     }
   }
 
   // Phase 1 proposer
-  sendPrepareRequest(value: string): void {
+  sendPrepareRequest(value: string): Array<Message> {
     this.proposer.proposalNumber = this.proposer.getNewProposalNumber(this.receiver.highestSeenProposalNumber);
     this.proposer.proposedValue = value;
     this.proposer.responses = [];
@@ -73,21 +64,20 @@ export class PaxosNode {
 
     this.receiver.highestSeenProposalNumber = this.proposer.proposalNumber;
 
-    this.nodeList.forEach((node: PaxosNode): void => {
-      if (node !== this) {
-        const message: PrepareStageRequest = {
+    return this.nodeList
+      .filter((node: PaxosNode): boolean => node !== this)
+      .map((node: PaxosNode): PrepareStageRequest =>
+        <PrepareStageRequest>{
           kind: 'PrepareStageRequest',
           toNode: node,
           fromNode: this,
           proposalNumber: this.proposer.proposalNumber,
-        };
-        this.messagePool.addMessage(message);
-      }
-    });
+        }
+      );
   }
 
   // Phase 1 proposer
-  receivePrepareResponse(message: PrepareStageResponse): void {
+  receivePrepareResponse(message: PrepareStageResponse): Array<Message> {
     if (!this.proposer.isProposing) {
       return;
     }
@@ -102,59 +92,68 @@ export class PaxosNode {
 
       if (proposalNumber > this.proposer.proposalNumber) {
         this.proposer.isProposing = false;
-      } else {
-        if (value !== null) {
-          this.proposer.proposedValue = value;
-        }
-        this.sendAcceptRequest();
+        return [];
       }
+
+      if (value !== null) {
+        this.proposer.proposedValue = value;
+      }
+
+      return this.sendAcceptRequest();
     }
+
+    return [];
   }
 
   // Phase 2 proposer
-  sendAcceptRequest(): void {
-    this.nodeList.forEach((node: PaxosNode): void => {
-      if (node !== this) {
-        const message: AcceptStageRequest = {
+  sendAcceptRequest(): Array<Message> {
+    return this.nodeList
+      .filter((node: PaxosNode): boolean => node !== this)
+      .map((node: PaxosNode): AcceptStageRequest =>
+        <AcceptStageRequest>{
           kind: 'AcceptStageRequest',
           toNode: node,
           fromNode: this,
           proposalNumber: this.proposer.proposalNumber,
           value: this.proposer.proposedValue,
-        };
-        this.messagePool.addMessage(message);
-      }
-    });
+        }
+      )
   }
 
   // Phase 1 receiver
-  receivePrepareRequest(message: PrepareStageRequest): void {
-    const response: PrepareStageResponse = {
-      kind: 'PrepareStageResponse',
-      toNode: message.fromNode,
-      fromNode: this,
-      proposalNumber: this.receiver.highestSeenProposalNumber,
-      value: this.receiver.acceptedValue,
-    };
-    this.messagePool.addMessage(response);
+  receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
+    const highestSeenProposalNumber = this.receiver.highestSeenProposalNumber;
+    const acceptedValue = this.receiver.acceptedValue;
 
     if (!this.receiver.highestSeenProposalNumber ||
         message.proposalNumber > this.receiver.highestSeenProposalNumber) {
       this.receiver.highestSeenProposalNumber = message.proposalNumber;
       this.receiver.acceptedValue = null;
     }
+
+    return [
+      <PrepareStageResponse>{
+        kind: 'PrepareStageResponse',
+        toNode: message.fromNode,
+        fromNode: this,
+        proposalNumber: highestSeenProposalNumber,
+        value: acceptedValue,
+      }
+    ];
   }
 
   // Phase 2 receiver
-  receiveAcceptRequest(message: AcceptStageRequest): void {
+  receiveAcceptRequest(message: AcceptStageRequest): Array<Message> {
     if (message.proposalNumber >= this.receiver.highestSeenProposalNumber) {
       this.receiver.highestSeenProposalNumber = message.proposalNumber;
       this.receiver.acceptedValue = message.value;
     }
+    return [];
   }
 
   // Phase 2 learner
-  receiveAcceptResponse(message: AcceptStageResponse): void {
+  receiveAcceptResponse(message: AcceptStageResponse): Array<Message> {
     // TODO: implement me!
+    return [];
   }
 }

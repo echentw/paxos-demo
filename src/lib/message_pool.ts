@@ -1,5 +1,5 @@
 import { Message } from './message';
-import { PaxosNode } from './paxos_node';
+
 
 export class MessagePool {
   public messagesById: Map<string, Message>;
@@ -17,18 +17,14 @@ export class MessagePool {
     this.messagesById.set(id, message);
   }
 
-  deliverMessage(id: string): void {
+  retriveMessage(id: string): Message {
     const message = this.messagesById.get(id);
     this.messagesById.delete(id);
-
-    if (message) {
-      const receiverNode: PaxosNode = message.toNode;
-      receiverNode.receiveMessage(message);
-    }
+    return message;
   }
 
-  dropMessage(id: string): void {
-    this.messagesById.delete(id);
+  dropMessage(id: string): boolean {
+    return this.messagesById.delete(id);
   }
 
   clear(): void {
