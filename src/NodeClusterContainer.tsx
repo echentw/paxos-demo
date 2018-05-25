@@ -30,7 +30,7 @@ export class NodeClusterContainer extends React.Component<NodeClusterContainerPr
 
   render() {
     const nodeContainers = this.props.nodes.map((node) =>
-      <div className="node"></div>
+      <NodeContainer node={node}/>
     );
     return (
       <div className="nodes-container">
