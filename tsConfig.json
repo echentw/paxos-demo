@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "outDir": "build/",
-    "target": "es5",
-    "lib": ["es5", "es6", "dom"],
-    "module": "commonjs",
-    "jsx": "react",
+    "outDir": "./dist/",
     "sourceMap": true,
-    "allowJs": true
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "lib": ["es5", "es6", "dom"],
+    "target": "es5",
+    "jsx": "react"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",
