@@ -35,6 +35,5 @@ export class Receiver {
 }
 
 export class Learner {
-  public countsByChosenValue: Map<string, number>;
-  public chosenValue: string | null;
+  public acceptedCount: number;
 }

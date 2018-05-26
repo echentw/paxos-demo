@@ -18,14 +18,24 @@ export interface PrepareStageResponse extends MessageBase {
 }
 
 export interface AcceptStageRequest extends MessageBase {
-  kind: 'AcceptStageRequest',
+  kind: 'AcceptStageRequest';
   proposalNumber: number;
   value: string;
 }
 
 export interface AcceptStageResponse extends MessageBase {
-  kind: 'AcceptStageResponse',
-  proposalNumber: number
+  kind: 'AcceptStageResponse';
+  proposalNumber: number;
 }
 
-export type Message = PrepareStageRequest | PrepareStageResponse | AcceptStageRequest | AcceptStageResponse;
+export interface ChosenValueResponse extends MessageBase {
+  kind: 'ChosenValueResponse';
+  value: string;
+}
+
+export type Message =
+  | PrepareStageRequest
+  | PrepareStageResponse
+  | AcceptStageRequest
+  | AcceptStageResponse
+  | ChosenValueResponse;

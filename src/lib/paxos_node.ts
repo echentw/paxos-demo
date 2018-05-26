@@ -3,6 +3,7 @@ import {
   PrepareStageResponse,
   AcceptStageRequest,
   AcceptStageResponse,
+  ChosenValueResponse,
   Message,
 } from './message';
 
@@ -52,8 +53,6 @@ export class PaxosNode {
     this.proposer.responses = [];
     this.proposer.isProposing = true;
 
-    this.learner.countsByChosenValue = new Map<string, number>();
-
     this.proposer.responses.push({
       kind: 'PrepareStageResponse',
       toNode: this,
@@ -79,7 +78,7 @@ export class PaxosNode {
   // Phase 1 proposer
   receivePrepareResponse(message: PrepareStageResponse): Array<Message> {
     if (!this.proposer.isProposing) {
-      return;
+      return [];
     }
 
     this.proposer.responses.push(message);
@@ -107,6 +106,7 @@ export class PaxosNode {
 
   // Phase 2 proposer
   sendAcceptRequest(): Array<Message> {
+    this.learner.acceptedCount = 1;
     return this.nodeList
       .filter((node: PaxosNode): boolean => node !== this)
       .map((node: PaxosNode): AcceptStageRequest =>
@@ -148,12 +148,33 @@ export class PaxosNode {
       this.receiver.highestSeenProposalNumber = message.proposalNumber;
       this.receiver.acceptedValue = message.value;
     }
-    return [];
+    return [
+      <AcceptStageResponse>{
+        kind: 'AcceptStageResponse',
+        proposalNumber: this.receiver.highestSeenProposalNumber,
+      }
+    ];
   }
 
   // Phase 2 learner
   receiveAcceptResponse(message: AcceptStageResponse): Array<Message> {
-    // TODO: implement me!
+    if (!this.proposer.isProposing) {
+      return [];
+    }
+
+    if (message.proposalNumber === this.proposer.proposalNumber) {
+      this.learner.acceptedCount += 1;
+    }
+
+    if (this.learner.acceptedCount > this.nodeList.length / 2) {
+      return [
+        <ChosenValueResponse>{
+          kind: 'ChosenValueResponse',
+          value: this.proposer.proposedValue,
+        }
+      ];
+    }
+
     return [];
   }
 }
