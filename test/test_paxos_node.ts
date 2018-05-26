@@ -5,6 +5,7 @@ import {
   PrepareStageRequest,
   PrepareStageResponse,
   AcceptStageRequest,
+  AcceptStageResponse,
 } from '../src/lib/message';
 
 import { PaxosNode } from '../src/lib/paxos_node';
@@ -25,32 +26,34 @@ describe('PaxosNode', () => {
   });
 
   describe('Proposer', () => {
-    it('should send a prepare message to everyone', () => {
-      const requests: Array<Message> = nodes[0].sendPrepareRequest('juicy juicy burger');
-      assert.lengthOf(requests, 4);
-      assert.hasAllKeys(new Set(requests.map(r => r.toNode)), nodes.slice(1, 5));
-    });
+    describe('Phase 1', () => {
+      it('should send a prepare message to everyone', () => {
+        const requests: Array<Message> = nodes[0].sendPrepareRequest('juicy juicy burger');
+        assert.lengthOf(requests, 4);
+        assert.hasAllKeys(new Set(requests.map(r => r.toNode)), nodes.slice(1, 5));
+      });
 
-    it('should generate a new higher proposal number', () => {
-      const message: PrepareStageRequest = {
-        kind: 'PrepareStageRequest',
-        toNode: nodes[0],
-        fromNode: nodes[1],
-        proposalNumber: 123,
-      };
+      it('should generate a new higher proposal number', () => {
+        const message: PrepareStageRequest = {
+          kind: 'PrepareStageRequest',
+          toNode: nodes[0],
+          fromNode: nodes[1],
+          proposalNumber: 123,
+        };
 
-      const responses: Array<Message> = nodes[0].receivePrepareRequest(message);
-      assert.lengthOf(responses, 1);
+        const responses: Array<Message> = nodes[0].receivePrepareRequest(message);
+        assert.lengthOf(responses, 1);
 
-      const requests: Array<Message> = nodes[0].sendPrepareRequest('french fries');
-      assert.lengthOf(requests, 4);
-      requests.forEach((message: PrepareStageRequest) => {
-        assert.equal('PrepareStageRequest', message.kind);
-        assert(message.proposalNumber > 123);
+        const requests: Array<Message> = nodes[0].sendPrepareRequest('french fries');
+        assert.lengthOf(requests, 4);
+        requests.forEach((message: PrepareStageRequest) => {
+          assert.equal('PrepareStageRequest', message.kind);
+          assert(message.proposalNumber > 123);
+        });
       });
     });
 
-    describe('initiating phase 2', () => {
+    describe('Phase 2', () => {
       let proposalNumber: number;
       let responses: Array<Message>;
 
@@ -104,90 +107,105 @@ describe('PaxosNode', () => {
       receiver = nodes[0];
     });
 
-    it('should respond with null proposal number', () => {
-      const responses = receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 123,
-      });
-      assert.lengthOf(responses, 1);
-      const response = <PrepareStageResponse>responses[0];
+    describe('Phase 1', () => {
+      it('should respond with null proposal number', () => {
+        const responses = receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 123,
+        });
+        assert.lengthOf(responses, 1);
+        const response = <PrepareStageResponse>responses[0];
 
-      assert.equal(response.proposalNumber, null);
-      assert.equal(response.value, null);
+        assert.equal(response.proposalNumber, null);
+        assert.equal(response.value, null);
+      });
+
+      it('should respond with highest seen proposal number', () => {
+        receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 80,
+        });
+
+        const responses = receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 123,
+        });
+        assert.lengthOf(responses, 1);
+        const response = <PrepareStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 80);
+        assert.equal(response.value, null);
+      });
+
+      it('should respond with higher proposal number', () => {
+        receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 300,
+        });
+
+        const responses = receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 123,
+        });
+        assert.lengthOf(responses, 1);
+        const response = <PrepareStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 300);
+        assert.equal(response.value, null);
+      });
+
+      it('should respond with lower number and previously accepted value', () => {
+        receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 200,
+        });
+        receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 200,
+          value: 'pizza',
+        });
+
+        const responses = receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 300,
+        });
+        assert.lengthOf(responses, 1);
+        const response = <PrepareStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 200);
+        assert.equal(response.value, 'pizza');
+      });
+
+      it('should respond with higher number and previously accepted value', () => {
+        receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 400,
+        });
+        receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 400,
+          value: 'pizza',
+        });
+
+        const responses = receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 300,
+        });
+        assert.lengthOf(responses, 1);
+        const response = <PrepareStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 400);
+        assert.equal(response.value, 'pizza');
+      });
     });
 
-    it('should respond with highest seen proposal number', () => {
-      receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 80,
+    describe('Phase 2', () => {
+      it ('should accept the proposal', () => {
+        const responses = receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 100,
+          value: 'ice cream',
+        });
+        assert.lengthOf(responses, 1);
+        const response = <AcceptStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 100);
       });
-
-      const responses = receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 123,
-      });
-      assert.lengthOf(responses, 1);
-      const response = <PrepareStageResponse>responses[0];
-      assert.equal(response.proposalNumber, 80);
-      assert.equal(response.value, null);
-    });
-
-    it('should respond with higher proposal number', () => {
-      receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 300,
-      });
-
-      const responses = receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 123,
-      });
-      assert.lengthOf(responses, 1);
-      const response = <PrepareStageResponse>responses[0];
-      assert.equal(response.proposalNumber, 300);
-      assert.equal(response.value, null);
-    });
-
-    it('should respond with lower number and previously accepted value', () => {
-      receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 200,
-      });
-      receiver.receiveMessage(<AcceptStageRequest>{
-        kind: 'AcceptStageRequest',
-        proposalNumber: 200,
-        value: 'pizza',
-      });
-
-      const responses = receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 300,
-      });
-      assert.lengthOf(responses, 1);
-      const response = <PrepareStageResponse>responses[0];
-      assert.equal(response.proposalNumber, 200);
-      assert.equal(response.value, 'pizza');
-    });
-
-    it('should respond with higher number and previously accepted value', () => {
-      receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 400,
-      });
-      receiver.receiveMessage(<AcceptStageRequest>{
-        kind: 'AcceptStageRequest',
-        proposalNumber: 400,
-        value: 'pizza',
-      });
-
-      const responses = receiver.receiveMessage(<PrepareStageRequest>{
-        kind: 'PrepareStageRequest',
-        proposalNumber: 300,
-      });
-      assert.lengthOf(responses, 1);
-      const response = <PrepareStageResponse>responses[0];
-      assert.equal(response.proposalNumber, 400);
-      assert.equal(response.value, 'pizza');
     });
   });
 

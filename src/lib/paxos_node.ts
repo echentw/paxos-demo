@@ -144,7 +144,8 @@ export class PaxosNode {
 
   // Phase 2 receiver
   receiveAcceptRequest(message: AcceptStageRequest): Array<Message> {
-    if (message.proposalNumber >= this.receiver.highestSeenProposalNumber) {
+    if (!this.receiver.highestSeenProposalNumber ||
+        message.proposalNumber >= this.receiver.highestSeenProposalNumber) {
       this.receiver.highestSeenProposalNumber = message.proposalNumber;
       this.receiver.acceptedValue = message.value;
     }
