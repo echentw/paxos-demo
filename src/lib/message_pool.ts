@@ -12,9 +12,10 @@ export class MessagePool {
     return 'id_' + Math.random().toString(36).substr(2, 9);
   }
 
-  addMessage(message: Message): void {
+  addMessage(message: Message): string {
     const id = this._uniqueId();
     this.messagesById.set(id, message);
+    return id;
   }
 
   retriveMessage(id: string): Message {
