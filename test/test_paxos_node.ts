@@ -76,7 +76,7 @@ describe('PaxosNode', () => {
         assert.lengthOf(requests, 4);
       });
 
-      it('should not begin phase 2 if it receives a proposal with a higher number', () => {
+      it('should not initiate if it receives a proposal with a higher number', () => {
         nodes[0].receiveMessage(<PrepareStageResponse>{
           kind: 'PrepareStageResponse',
           proposalNumber: proposalNumber + 1,
@@ -85,7 +85,7 @@ describe('PaxosNode', () => {
         assert.lengthOf(requests, 0);
       });
 
-      it('should begin phase 2 even if it receives a proposal with a lower number', () => {
+      it('should initiate even if it receives a proposal with a lower number', () => {
         nodes[0].receiveMessage(<PrepareStageResponse>{
           kind: 'PrepareStageResponse',
           proposalNumber: proposalNumber - 1,
