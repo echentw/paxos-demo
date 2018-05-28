@@ -43,6 +43,9 @@ export class PaxosNode {
       case 'AcceptStageResponse': {
         return this.receiveAcceptResponse(message);
       }
+      default: {
+        return [];
+      }
     }
   }
 

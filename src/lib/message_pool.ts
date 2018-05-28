@@ -18,7 +18,7 @@ export class MessagePool {
     return id;
   }
 
-  retriveMessage(id: string): Message {
+  retrieveMessage(id: string): Message | undefined {
     const message = this.messagesById.get(id);
     this.messagesById.delete(id);
     return message;

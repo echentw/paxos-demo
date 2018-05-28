@@ -3,6 +3,7 @@
     "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": false,
+    "strictNullChecks": true,
     "module": "commonjs",
     "lib": ["es5", "es6", "dom"],
     "target": "es5",
