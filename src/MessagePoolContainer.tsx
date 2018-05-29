@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { MessagePool } from './lib/message_pool';
+import { Message } from './lib/message';
+import { MessagePool, IdMessagePair } from './lib/message_pool';
 
 
 class MessageContainer extends React.Component {
@@ -21,16 +22,12 @@ export class MessagePoolContainer extends React.Component<MessagePoolContainerPr
   }
 
   render() {
+    const messageContainers = this.props.messagePool.idMessagePairs.map((pair: IdMessagePair) => {
+      return <MessageContainer/>;
+    });
     return (
       <div className="message-pool-container">
-        <MessageContainer/>
-        <MessageContainer/>
-        <MessageContainer/>
-        <MessageContainer/>
-        <MessageContainer/>
-        <MessageContainer/>
-        <MessageContainer/>
-        <MessageContainer/>
+        {messageContainers}
       </div>
     );
   }

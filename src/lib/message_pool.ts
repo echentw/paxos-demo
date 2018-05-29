@@ -1,11 +1,16 @@
 import { Message } from './message';
 
 
+export interface IdMessagePair {
+  id: string,
+  message: Message,
+}
+
 export class MessagePool {
-  public messagesById: Map<string, Message>;
+  public idMessagePairs: Array<IdMessagePair>;
 
   constructor() {
-    this.messagesById = new Map<string, Message>();
+    this.idMessagePairs = [];
   }
 
   _uniqueId(): string {
@@ -14,21 +19,30 @@ export class MessagePool {
 
   addMessage(message: Message): string {
     const id = this._uniqueId();
-    this.messagesById.set(id, message);
+    this.idMessagePairs.push({
+      id: id,
+      message: message,
+    });
     return id;
   }
 
-  retrieveMessage(id: string): Message | undefined {
-    const message = this.messagesById.get(id);
-    this.messagesById.delete(id);
-    return message;
+  retrieveMessage(id: string): Message | null {
+    const messages = this.idMessagePairs
+      .filter((pair) => pair.id === id)
+      .map((pair) => pair.message);
+    if (messages.length > 0) {
+      this.idMessagePairs = this.idMessagePairs.filter((pair) => pair.id !== id);
+      return messages[0];
+    } else {
+      return null;
+    }
   }
 
-  dropMessage(id: string): boolean {
-    return this.messagesById.delete(id);
+  dropMessage(id: string): void {
+    this.idMessagePairs = this.idMessagePairs.filter((pair) => pair.id !== id);
   }
 
   clear(): void {
-    this.messagesById.clear();
+    this.idMessagePairs = [];
   }
 }

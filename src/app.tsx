@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import { Droppable } from '@shopify/draggable';
 
+import { Message } from './lib/message';
+
 import { PaxosNode } from './lib/paxos_node';
 import { MessagePool } from './lib/message_pool';
 
@@ -33,10 +35,22 @@ export class App extends React.Component<any, any> {
     console.log(containers);
   }
 
+  createNewMessages = (messages: Array<Message>): void => {
+    messages.forEach((message) => {
+      this.state.messagePool.addMessage(message);
+    });
+    this.setState({
+      messagePool: this.state.messagePool,
+    });
+  }
+
   render() {
     return (
       <div className="container">
-        <NodeClusterContainer nodes={this.state.nodes}/>
+        <NodeClusterContainer
+          nodes={this.state.nodes}
+          createNewMessages={this.createNewMessages}
+        />
         <MessagePoolContainer messagePool={this.state.messagePool}/>
       </div>
     );

@@ -68,7 +68,7 @@ describe('MessagePool', () => {
     assert.equal(retrievedMessage, message);
 
     const retrievedMessageAgain = messagePool.retrieveMessage(id);
-    assert.isUndefined(retrievedMessageAgain);
+    assert.isNull(retrievedMessageAgain);
   });
 
   it('should not be able to retrieve a message after clearing', () => {
@@ -83,7 +83,7 @@ describe('MessagePool', () => {
     messagePool.clear();
 
     const retrievedMessage = messagePool.retrieveMessage(id);
-    assert.isUndefined(retrievedMessage);
+    assert.isNull(retrievedMessage);
   });
 
   it('should not be able to retrieve message after dropping', () => {
@@ -96,9 +96,8 @@ describe('MessagePool', () => {
     const id = messagePool.addMessage(message);
 
     const success = messagePool.dropMessage(id);
-    assert.isTrue(success);
 
     const retrievedMessage = messagePool.retrieveMessage(id);
-    assert.isUndefined(retrievedMessage);
+    assert.isNull(retrievedMessage);
   });
 });

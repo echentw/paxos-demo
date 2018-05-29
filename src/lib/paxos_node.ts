@@ -31,21 +31,11 @@ export class PaxosNode {
 
   receiveMessage(message: Message): Array<Message> {
     switch(message.kind) {
-      case 'PrepareStageRequest': {
-        return this.receivePrepareRequest(message);
-      }
-      case 'PrepareStageResponse': {
-        return this.receivePrepareResponse(message);
-      }
-      case 'AcceptStageRequest': {
-        return this.receiveAcceptRequest(message);
-      }
-      case 'AcceptStageResponse': {
-        return this.receiveAcceptResponse(message);
-      }
-      default: {
-        return [];
-      }
+      case 'PrepareStageRequest': return this.receivePrepareRequest(message);
+      case 'PrepareStageResponse': return this.receivePrepareResponse(message);
+      case 'AcceptStageRequest': return this.receiveAcceptRequest(message);
+      case 'AcceptStageResponse': return this.receiveAcceptResponse(message);
+      default: return [];
     }
   }
 
