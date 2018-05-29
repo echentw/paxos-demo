@@ -102,9 +102,11 @@ describe('PaxosNode', () => {
 
   describe('Receiver', () => {
     let receiver: PaxosNode;
+    let sender: PaxosNode;
 
     beforeEach(() => {
       receiver = nodes[0];
+      sender = nodes[1];
     });
 
     describe('Phase 1', () => {
@@ -196,7 +198,7 @@ describe('PaxosNode', () => {
     });
 
     describe('Phase 2', () => {
-      it ('should accept the proposal', () => {
+      it('should accept the proposal', () => {
         const responses = receiver.receiveMessage(<AcceptStageRequest>{
           kind: 'AcceptStageRequest',
           proposalNumber: 100,
@@ -206,12 +208,82 @@ describe('PaxosNode', () => {
         const response = <AcceptStageResponse>responses[0];
         assert.equal(response.proposalNumber, 100);
       });
+
+      it('it should accept the proposal if it received a lower number prepare request', () => {
+        receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 200,
+        });
+        const responses = receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 300,
+          value: 'banana pudding',
+        });
+        assert.lengthOf(responses, 1);
+        const response = <AcceptStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 300);
+      });
+
+      it('it should accept the proposal if it received a lower number accept request', () => {
+        receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 200,
+          value: 'fried chicken',
+        });
+        const responses = receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 300,
+          value: 'banana pudding',
+        });
+        assert.lengthOf(responses, 1);
+        const response = <AcceptStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 300);
+      });
+
+      it('it should not accept the proposal if it received a higher number prepare request', () => {
+        receiver.receiveMessage(<PrepareStageRequest>{
+          kind: 'PrepareStageRequest',
+          proposalNumber: 200,
+        });
+        const responses = receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 100,
+          value: 'banana pudding',
+        });
+        assert.lengthOf(responses, 1);
+        const response = <AcceptStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 200);
+      });
+
+      it('it should not accept the proposal if it received a higher number accept request', () => {
+        receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 200,
+          value: 'fried chicken',
+        });
+        const responses = receiver.receiveMessage(<AcceptStageRequest>{
+          kind: 'AcceptStageRequest',
+          proposalNumber: 100,
+          value: 'banana pudding',
+        });
+        assert.lengthOf(responses, 1);
+        const response = <AcceptStageResponse>responses[0];
+        assert.equal(response.proposalNumber, 200);
+      });
     });
   });
 
   describe('Learner', () => {
-    it('should blah', () => {
-      assert.equal(1, 1);
+    describe('Phase 1', () => {
+      it('should blah', () => {
+        assert.equal(1, 1);
+      });
+    });
+
+    describe('Phase 2', () => {
+      it('should blah', () => {
+        assert.equal(1, 1);
+      });
     });
   });
 });
