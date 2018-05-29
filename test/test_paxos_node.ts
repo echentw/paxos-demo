@@ -6,6 +6,7 @@ import {
   PrepareStageResponse,
   AcceptStageRequest,
   AcceptStageResponse,
+  ChosenValueResponse,
 } from '../src/lib/message';
 
 import { PaxosNode } from '../src/lib/paxos_node';
@@ -274,15 +275,33 @@ describe('PaxosNode', () => {
   });
 
   describe('Learner', () => {
-    describe('Phase 1', () => {
-      it('should blah', () => {
-        assert.equal(1, 1);
-      });
+    let learner: PaxosNode;
+
+    beforeEach(() => {
+      learner = nodes[0];
     });
 
     describe('Phase 2', () => {
-      it('should blah', () => {
-        assert.equal(1, 1);
+      it('should respond with the chosen value', () => {
+        const messages = learner.sendPrepareRequest('steak');
+        const proposalNumber = (<PrepareStageRequest>messages[0]).proposalNumber;
+
+        learner.sendAcceptRequest();
+
+        let result = learner.receiveMessage(<AcceptStageResponse>{
+          kind: 'AcceptStageResponse',
+          proposalNumber: proposalNumber,
+        });
+        assert.lengthOf(result, 0);
+
+        result = learner.receiveMessage(<AcceptStageResponse>{
+          kind: 'AcceptStageResponse',
+          proposalNumber: proposalNumber,
+        });
+        assert.lengthOf(result, 1);
+
+        const response = <ChosenValueResponse>result[0];
+        assert.equal(response.value, 'steak');
       });
     });
   });
