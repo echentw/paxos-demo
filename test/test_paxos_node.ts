@@ -276,18 +276,17 @@ describe('PaxosNode', () => {
 
   describe('Learner', () => {
     let learner: PaxosNode;
+    let proposalNumber: number;
 
     beforeEach(() => {
       learner = nodes[0];
+      const messages = learner.sendPrepareRequest('steak');
+      proposalNumber = (<PrepareStageRequest>messages[0]).proposalNumber;
+      learner.sendAcceptRequest();
     });
 
     describe('Phase 2', () => {
       it('should respond with the chosen value', () => {
-        const messages = learner.sendPrepareRequest('steak');
-        const proposalNumber = (<PrepareStageRequest>messages[0]).proposalNumber;
-
-        learner.sendAcceptRequest();
-
         let result = learner.receiveMessage(<AcceptStageResponse>{
           kind: 'AcceptStageResponse',
           proposalNumber: proposalNumber,
@@ -302,6 +301,32 @@ describe('PaxosNode', () => {
 
         const response = <ChosenValueResponse>result[0];
         assert.equal(response.value, 'steak');
+      });
+
+      it('should only respond with the chosen value once', () => {
+        let result = learner.receiveMessage(<AcceptStageResponse>{
+          kind: 'AcceptStageResponse',
+          proposalNumber: proposalNumber,
+        });
+        assert.lengthOf(result, 0);
+
+        result = learner.receiveMessage(<AcceptStageResponse>{
+          kind: 'AcceptStageResponse',
+          proposalNumber: proposalNumber,
+        });
+        assert.lengthOf(result, 1);
+
+        result = learner.receiveMessage(<AcceptStageResponse>{
+          kind: 'AcceptStageResponse',
+          proposalNumber: proposalNumber,
+        });
+        assert.lengthOf(result, 0);
+
+        result = learner.receiveMessage(<AcceptStageResponse>{
+          kind: 'AcceptStageResponse',
+          proposalNumber: proposalNumber,
+        });
+        assert.lengthOf(result, 0);
       });
     });
   });

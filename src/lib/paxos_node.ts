@@ -171,6 +171,7 @@ export class PaxosNode {
     }
 
     if (this.learner.acceptedCount > this.nodeList.length / 2) {
+      this.proposer.isProposing = false;
       return [
         <ChosenValueResponse>{
           kind: 'ChosenValueResponse',
