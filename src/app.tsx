@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import { Droppable } from '@shopify/draggable';
-
 import { Message } from './lib/message';
 
 import { PaxosNode } from './lib/paxos_node';
@@ -28,11 +26,6 @@ export class App extends React.Component<any, any> {
       messagePool: messagePool,
       nodes: nodes,
     };
-  }
-
-  componentDidMount() {
-    const containers = document.querySelectorAll('.message');
-    console.log(containers);
   }
 
   createNewMessages = (messages: Array<Message>): void => {
