@@ -44,3 +44,19 @@
   width: 100px;
   background-color: tomato;
 }
+
+.message-kind {
+  font-size: 12px;
+}
+
+.message-from {
+  font-size: 12px;
+}
+
+.message-to {
+  font-size: 12px;
+}
+
+.message-proposal-number {
+  font-size: 12px;
+}

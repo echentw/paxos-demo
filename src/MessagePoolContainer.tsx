@@ -1,13 +1,56 @@
 import * as React from 'react';
 
-import { Message } from './lib/message';
+import {
+  Message,
+  PrepareStageRequest,
+  PrepareStageResponse,
+  AcceptStageRequest,
+  AcceptStageResponse,
+} from './lib/message';
+
 import { MessagePool, IdMessagePair } from './lib/message_pool';
 
+interface MessageContainerProps {
+  id: string,
+  message: Message,
+}
 
-class MessageContainer extends React.Component {
+class MessageContainer extends React.Component<MessageContainerProps, {}> {
+  constructor(props: MessageContainerProps) {
+    super(props);
+  }
+
   render() {
+    const { message } = this.props;
+    switch(message.kind) {
+      case 'PrepareStageRequest': {
+        return (
+          <div className="message" id={this.props.id}>
+            <div className="message-kind">Prepare Request</div>
+            <div className="message-from">To: some node</div>
+            <div className="message-to">From: other node</div>
+            <div className="message-proposal-number">Proposal #{message.proposalNumber}</div>
+          </div>
+        );
+      }
+      case 'PrepareStageResponse': {
+        // TODO: handle this case
+        break;
+      }
+      case 'AcceptStageRequest': {
+        // TODO: handle this case
+        break;
+      }
+      case 'AcceptStageResponse': {
+        // TODO: handle this case
+        break;
+      }
+    }
+
+    // TODO: get rid of this eventually
     return (
-      <div className="message"></div>
+      <div className="message" id={this.props.id}>
+      </div>
     );
   }
 }
@@ -23,7 +66,7 @@ export class MessagePoolContainer extends React.Component<MessagePoolContainerPr
 
   render() {
     const messageContainers = this.props.messagePool.idMessagePairs.map((pair: IdMessagePair) => {
-      return <MessageContainer/>;
+      return <MessageContainer id={pair.id} message={pair.message}/>;
     });
     return (
       <div className="message-pool-container">
@@ -32,4 +75,3 @@ export class MessagePoolContainer extends React.Component<MessagePoolContainerPr
     );
   }
 }
-
