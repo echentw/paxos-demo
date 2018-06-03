@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
+
 import { Message } from './lib/message';
 
 import { PaxosNode } from './lib/paxos_node';
@@ -9,7 +12,7 @@ import { MessagePoolContainer } from './MessagePoolContainer';
 import { NodeClusterContainer } from './NodeClusterContainer';
 
 
-export class App extends React.Component<any, any> {
+class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     const messagePool = new MessagePool();
@@ -49,3 +52,5 @@ export class App extends React.Component<any, any> {
     );
   }
 }
+
+export default DragDropContext(HTML5Backend)(App);

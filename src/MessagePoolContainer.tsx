@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { MessagePool, IdMessagePair } from './lib/message_pool';
 
-import { MessageContainer } from './MessageContainer';
+import MessageContainer from './MessageContainer';
 
 
 interface MessagePoolContainerProps {

@@ -1,0 +1,3 @@
+tsconfig.json
+  Need this line for react-dnd to work.
+  "allowSyntheticDefaultImports": true
