@@ -3,7 +3,7 @@ import * as React from 'react';
 import { Message } from './lib/message';
 import { PaxosNode } from './lib/paxos_node';
 
-import { NodeContainer } from './NodeContainer';
+import NodeContainer from './NodeContainer';
 
 
 interface NodeClusterContainerProps {

@@ -28,7 +28,7 @@ interface MessageContainerProps {
   id: string,
   message: Message,
   connectDragSource: Function,
-  isDragging: Function,
+  isDragging: boolean,
 }
 
 class MessageContainer extends React.Component<MessageContainerProps, {}> {
@@ -38,11 +38,12 @@ class MessageContainer extends React.Component<MessageContainerProps, {}> {
 
   render() {
     const { connectDragSource, isDragging, message } = this.props;
+    const classes = isDragging ? 'message is-dragging' : 'message';
     let component;
     switch(message.kind) {
       case 'PrepareStageRequest': {
         component = (
-          <div className="message" id={this.props.id}>
+          <div className={classes} id={this.props.id}>
             <div className="message-kind">Prepare Request</div>
             <div className="message-from">To: some node</div>
             <div className="message-to">From: other node</div>
@@ -60,7 +61,7 @@ class MessageContainer extends React.Component<MessageContainerProps, {}> {
       case 'AcceptStageResponse': {
         // TODO: handle this case
         component = (
-          <div className="message" id={this.props.id}>
+          <div className={classes} id={this.props.id}>
           </div>
         );
         break;
