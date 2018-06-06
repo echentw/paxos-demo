@@ -3,11 +3,20 @@ import { DropTarget } from 'react-dnd';
 
 import { Message } from './lib/message';
 import { PaxosNode } from './lib/paxos_node';
+import Paxos from './lib/paxos';
 
 
 const nodeDropTarget = {
-  drop(props, monitor) {
-    console.log('node is detecting a drop on top of it');
+  drop(props, monitor, component) {
+    return { success: true };
+  },
+
+  canDrop(props, monitor) {
+    const { node } = props;
+    const { messagePool } = props.paxos;
+    const { messageId } = monitor.getItem();
+    const message = messagePool.peekMessage(messageId);
+    return message.toNode == node;
   }
 }
 
@@ -21,6 +30,7 @@ function collect(connect, monitor) {
 interface NodeContainerProps {
   node: PaxosNode;
   createNewMessages: (messages: Array<Message>) => void;
+  paxos: Paxos;
   connectDropTarget: Function,
   isOver: boolean,
 }

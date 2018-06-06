@@ -26,6 +26,18 @@ export class MessagePool {
     return id;
   }
 
+  // TODO: make this more efficient
+  peekMessage(id: string): Message | null {
+    const messages = this.idMessagePairs
+      .filter((pair) => pair.id === id)
+      .map((pair) => pair.message);
+    if (messages.length > 0) {
+      return messages[0];
+    } else {
+      return null;
+    }
+  }
+
   retrieveMessage(id: string): Message | null {
     const messages = this.idMessagePairs
       .filter((pair) => pair.id === id)

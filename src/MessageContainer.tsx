@@ -14,6 +14,12 @@ const messageDragSource = {
     return {
       messageId: props.id,
     };
+  },
+
+  endDrag(props, monitor) {
+    if (monitor.getDropResult()) {
+      props.deliverMessage(props.id);
+    }
   }
 };
 
@@ -27,6 +33,7 @@ function collect(connect, monitor) {
 interface MessageContainerProps {
   id: string,
   message: Message,
+  deliverMessage: (messageId: String) => void;
   connectDragSource: Function,
   isDragging: boolean,
 }

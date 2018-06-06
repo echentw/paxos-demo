@@ -7,6 +7,7 @@ import { Message } from './lib/message';
 
 import { PaxosNode } from './lib/paxos_node';
 import { MessagePool } from './lib/message_pool';
+import Paxos from './lib/paxos';
 
 import { MessagePoolContainer } from './MessagePoolContainer';
 import { NodeClusterContainer } from './NodeClusterContainer';
@@ -15,39 +16,37 @@ import { NodeClusterContainer } from './NodeClusterContainer';
 class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-    const messagePool = new MessagePool();
-    const nodes = [
-      new PaxosNode(0, 5),
-      new PaxosNode(1, 5),
-      new PaxosNode(2, 5),
-      new PaxosNode(3, 5),
-      new PaxosNode(4, 5),
-    ];
-    nodes.forEach((node) => node.initializeNodeList(nodes));
-
+    const paxos = new Paxos(5);
     this.state = {
-      messagePool: messagePool,
-      nodes: nodes,
+      paxos: paxos,
     };
   }
 
   createNewMessages = (messages: Array<Message>): void => {
     messages.forEach((message) => {
-      this.state.messagePool.addMessage(message);
+      this.state.paxos.messagePool.addMessage(message);
     });
-    this.setState({
-      messagePool: this.state.messagePool,
-    });
+    this.setState({ paxos: this.state.paxos });
+  }
+
+  deliverMessage = (messageId: String): void => {
+    const { messagePool } = this.state.paxos;
+    const message: Message = messagePool.retrieveMessage(messageId);
+    message.toNode.receiveMessage(message);
+    this.setState({ paxos: this.state.paxos });
   }
 
   render() {
     return (
       <div className="container">
         <NodeClusterContainer
-          nodes={this.state.nodes}
+          paxos={this.state.paxos}
           createNewMessages={this.createNewMessages}
         />
-        <MessagePoolContainer messagePool={this.state.messagePool}/>
+        <MessagePoolContainer
+          paxos={this.state.paxos}
+          deliverMessage={this.deliverMessage}
+        />
       </div>
     );
   }
