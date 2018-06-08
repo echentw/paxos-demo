@@ -88,7 +88,10 @@ class App extends React.Component<any, any> {
   deliverMessage = (messageId: String): void => {
     const { messagePool } = this.state.paxos;
     const message: Message = messagePool.retrieveMessage(messageId);
-    message.toNode.receiveMessage(message);
+    const responses = message.toNode.receiveMessage(message);
+    responses.forEach((response) => {
+      this.state.paxos.messagePool.addMessage(response);
+    });
     this.setState({
       nodeStates: getNodeStates(this.state.paxos),
       messageStates: getMessageStates(this.state.paxos),
