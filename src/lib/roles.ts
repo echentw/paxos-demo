@@ -12,6 +12,7 @@ export class Proposer {
   constructor(id: number, numNodes: number) {
     this.id = id;
     this.numNodes = numNodes;
+    this.reset();
   }
 
   reset(): void {

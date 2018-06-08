@@ -3,11 +3,14 @@ import * as React from 'react';
 import { MessagePool, IdMessagePair } from './lib/message_pool';
 import Paxos from './lib/paxos';
 
+import { MessageState } from './App';
+
 import MessageContainer from './MessageContainer';
 
 
 interface MessagePoolContainerProps {
   paxos: Paxos;
+  messageStates: Array<MessageState>;
   deliverMessage: (messageId: String) => void;
 }
 
@@ -17,14 +20,14 @@ export class MessagePoolContainer extends React.Component<MessagePoolContainerPr
   }
 
   render() {
-    const { messagePool } = this.props.paxos;
-    const messageContainers = messagePool.idMessagePairs.map((pair: IdMessagePair) =>
+    const { messageStates } = this.props;
+    const messageContainers = messageStates.map((messageState) => 
       <MessageContainer
-        id={pair.id}
-        message={pair.message}
+        messageState={messageState}
         deliverMessage={this.props.deliverMessage}
       />
     );
+
     return (
       <div className="message-pool-container">
         {messageContainers}

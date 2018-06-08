@@ -4,12 +4,15 @@ import { Message } from './lib/message';
 import { PaxosNode } from './lib/paxos_node';
 import Paxos from './lib/paxos';
 
+import { NodeState } from './App';
+
 import NodeContainer from './NodeContainer';
 
 
 interface NodeClusterContainerProps {
   paxos: Paxos;
-  createNewMessages: (messages: Array<Message>) => void;
+  nodeStates: Array<NodeState>;
+  initiatePaxos: (nodeId: number, proposedValue: string) => void;
 }
 
 export class NodeClusterContainer extends React.Component<NodeClusterContainerProps, {}> {
@@ -18,11 +21,11 @@ export class NodeClusterContainer extends React.Component<NodeClusterContainerPr
   }
 
   render() {
-    const { nodes } = this.props.paxos;
-    const nodeContainers = nodes.map((node) =>
+    const { nodeStates } = this.props;
+    const nodeContainers = nodeStates.map((nodeState) =>
       <NodeContainer
-        node={node}
-        createNewMessages={this.props.createNewMessages}
+        nodeState={nodeState}
+        initiatePaxos={this.props.initiatePaxos}
         paxos={this.props.paxos}
       />
     );

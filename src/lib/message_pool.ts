@@ -50,6 +50,10 @@ export class MessagePool {
     }
   }
 
+  getMessages(): Array<Message> {
+    return this.idMessagePairs.map((pair) => pair.message);
+  }
+
   dropMessage(id: string): void {
     this.idMessagePairs = this.idMessagePairs.filter((pair) => pair.id !== id);
   }

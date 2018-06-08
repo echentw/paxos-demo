@@ -12,6 +12,55 @@ import Paxos from './lib/paxos';
 import { MessagePoolContainer } from './MessagePoolContainer';
 import { NodeClusterContainer } from './NodeClusterContainer';
 
+export interface MessageState {
+  id: string;
+  name: string;
+  toNodeId: number;
+  fromNodeId: number;
+  // proposalNumber: number;
+}
+
+export interface NodeState {
+  // Global state
+  id: number;
+  isProposing: boolean;
+  proposalNumber: number;
+  acceptedValue: string | null;
+
+  // Proposer state
+  proposedValue: string;
+  responses: number;
+  // stage: 'Prepare';
+}
+
+function getNodeStates(paxos: Paxos): Array<NodeState> {
+  return paxos.nodes.map((node, index) => {
+    if (node.getId() !== index) {
+      throw Error('Something is terribly wrong!!!');
+    }
+    return {
+      id: node.getId(),
+      isProposing: node.isProposing(),
+      proposalNumber: node.getProposalNumber(),
+      acceptedValue: node.getAcceptedValue(),
+
+      proposedValue: node.getProposedValue(),
+      responses: node.getNumResponses(),
+    };
+  });
+}
+
+function getMessageStates(paxos: Paxos): Array<MessageState> {
+  return paxos.messagePool.idMessagePairs.map((pair) => {
+    const { id, message } = pair;
+    return {
+      id: id,
+      name: message.kind,
+      toNodeId: message.toNode.getId(),
+      fromNodeId: message.fromNode.getId(),
+    };
+  });
+}
 
 class App extends React.Component<any, any> {
   constructor(props: any) {
@@ -19,21 +68,31 @@ class App extends React.Component<any, any> {
     const paxos = new Paxos(5);
     this.state = {
       paxos: paxos,
+      nodeStates: getNodeStates(paxos),
+      messageStates: getMessageStates(paxos),
     };
   }
 
-  createNewMessages = (messages: Array<Message>): void => {
+  initiatePaxos = (nodeId: number, proposedValue: string): void => {
+    const node = this.state.paxos.nodes.find((node) => node.getId() == nodeId);
+    const messages = node.sendPrepareRequest(proposedValue);
     messages.forEach((message) => {
       this.state.paxos.messagePool.addMessage(message);
     });
-    this.setState({ paxos: this.state.paxos });
+    this.setState({
+      nodeStates: getNodeStates(this.state.paxos),
+      messageStates: getMessageStates(this.state.paxos),
+    });
   }
 
   deliverMessage = (messageId: String): void => {
     const { messagePool } = this.state.paxos;
     const message: Message = messagePool.retrieveMessage(messageId);
     message.toNode.receiveMessage(message);
-    this.setState({ paxos: this.state.paxos });
+    this.setState({
+      nodeStates: getNodeStates(this.state.paxos),
+      messageStates: getMessageStates(this.state.paxos),
+    });
   }
 
   render() {
@@ -41,11 +100,13 @@ class App extends React.Component<any, any> {
       <div className="container">
         <NodeClusterContainer
           paxos={this.state.paxos}
-          createNewMessages={this.createNewMessages}
+          initiatePaxos={this.initiatePaxos}
+          nodeStates={this.state.nodeStates}
         />
         <MessagePoolContainer
           paxos={this.state.paxos}
           deliverMessage={this.deliverMessage}
+          messageStates={this.state.messageStates}
         />
       </div>
     );

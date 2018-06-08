@@ -9,16 +9,19 @@ import {
   AcceptStageResponse,
 } from './lib/message';
 
+import { MessageState } from './App';
+
 const messageDragSource = {
   beginDrag(props) {
     return {
-      messageId: props.id,
+      messageId: props.messageState.id,
+      toNodeId: props.messageState.toNodeId,
     };
   },
 
   endDrag(props, monitor) {
     if (monitor.getDropResult()) {
-      props.deliverMessage(props.id);
+      props.deliverMessage(props.messageState.id);
     }
   }
 };
@@ -31,8 +34,7 @@ function collect(connect, monitor) {
 }
 
 interface MessageContainerProps {
-  id: string,
-  message: Message,
+  messageState: MessageState,
   deliverMessage: (messageId: String) => void;
   connectDragSource: Function,
   isDragging: boolean,
@@ -44,17 +46,18 @@ class MessageContainer extends React.Component<MessageContainerProps, {}> {
   }
 
   render() {
-    const { connectDragSource, isDragging, message } = this.props;
+    const { connectDragSource, isDragging, messageState } = this.props;
+    const { id, name, toNodeId, fromNodeId } = messageState;
     const classes = isDragging ? 'message is-dragging' : 'message';
     let component;
-    switch(message.kind) {
+    switch(name) {
       case 'PrepareStageRequest': {
         component = (
-          <div className={classes} id={this.props.id}>
+          <div className={classes} id={id}>
             <div className="message-kind">Prepare Request</div>
-            <div className="message-from">To: some node</div>
-            <div className="message-to">From: other node</div>
-            <div className="message-proposal-number">Proposal #{message.proposalNumber}</div>
+            <div className="message-from">From: #{fromNodeId}</div>
+            <div className="message-to">To: #{toNodeId}</div>
+            <div className="message-proposal-number">Proposal #TODO</div>
           </div>
         );
         break;
@@ -68,7 +71,7 @@ class MessageContainer extends React.Component<MessageContainerProps, {}> {
       case 'AcceptStageResponse': {
         // TODO: handle this case
         component = (
-          <div className={classes} id={this.props.id}>
+          <div className={classes} id={id}>
           </div>
         );
         break;

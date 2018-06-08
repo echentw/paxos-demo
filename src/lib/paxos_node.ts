@@ -11,6 +11,8 @@ import { Proposer, Receiver, Learner } from './roles';
 
 
 export class PaxosNode {
+  private id: number;
+
   private proposer: Proposer;
   private receiver: Receiver;
   private learner: Learner;
@@ -18,6 +20,8 @@ export class PaxosNode {
   private nodeList: Array<PaxosNode>;
 
   constructor(id: number, numNodes: number) {
+    this.id = id;
+
     this.proposer = new Proposer(id, numNodes);
     this.receiver = new Receiver();
     this.learner = new Learner();
@@ -172,4 +176,12 @@ export class PaxosNode {
 
     return [];
   }
+
+  // Getter methods
+  getId = () => this.id;
+  getProposalNumber = () => this.receiver.highestSeenProposalNumber;
+  isProposing = () => this.proposer.isProposing;
+  getAcceptedValue = () => this.receiver.acceptedValue;
+  getProposedValue = () => this.proposer.proposedValue;
+  getNumResponses = () => this.proposer.responses.length;
 }
