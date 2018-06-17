@@ -1,9 +1,7 @@
-import { PaxosNode } from './paxos_node';
-
 interface MessageBase {
   kind: string;
-  toNode: PaxosNode;
-  fromNode: PaxosNode;
+  toNodeId: number;
+  fromNodeId: number;
 }
 
 export interface PrepareStageRequest extends MessageBase {
@@ -13,29 +11,24 @@ export interface PrepareStageRequest extends MessageBase {
 
 export interface PrepareStageResponse extends MessageBase {
   kind: 'PrepareStageResponse',
-  proposalNumber: number;
-  value: string | null;
+  highestSeenProposalNumber: number;
+  previouslyAcceptedValue: string | null;
 }
 
 export interface AcceptStageRequest extends MessageBase {
   kind: 'AcceptStageRequest';
   proposalNumber: number;
-  value: string;
+  proposedValue: string;
 }
 
 export interface AcceptStageResponse extends MessageBase {
   kind: 'AcceptStageResponse';
-  proposalNumber: number;
-}
-
-export interface ChosenValueResponse extends MessageBase {
-  kind: 'ChosenValueResponse';
-  value: string;
+  highestSeenProposalNumber: number;
+  acceptedValue: string;
 }
 
 export type Message =
   | PrepareStageRequest
   | PrepareStageResponse
   | AcceptStageRequest
-  | AcceptStageResponse
-  | ChosenValueResponse;
+  | AcceptStageResponse;

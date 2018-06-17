@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { DropTarget } from 'react-dnd';
 
-import { Message } from './lib/message';
-import { PaxosNode } from './lib/paxos_node';
+import { Message } from './lib/message_types';
+import PaxosNode from './lib/paxos_node';
 import Paxos from './lib/paxos';
 
 import { NodeState } from './App';
@@ -47,6 +47,7 @@ class NodeContainer extends React.Component<NodeContainerProps, {}> {
   render() {
     const { connectDropTarget, isOver, nodeState } = this.props;
     const { id, isProposing, proposalNumber, acceptedValue, proposedValue, responses } = nodeState;
+    console.log('id', id, 'isProposing', isProposing);
     const classes = isOver ? 'node is-over' : 'node';
     return connectDropTarget(
       <div className={classes} onClick={this.handleClick}>
@@ -60,7 +61,7 @@ class NodeContainer extends React.Component<NodeContainerProps, {}> {
           Accepted Value: {acceptedValue}
         </div>
         <div className="node-is-proposing">
-          isProposing: {isProposing}
+          isProposing: {isProposing ? 'true' : 'false'}
         </div>
       </div>
     );

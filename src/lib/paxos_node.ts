@@ -3,185 +3,74 @@ import {
   PrepareStageResponse,
   AcceptStageRequest,
   AcceptStageResponse,
-  ChosenValueResponse,
   Message,
-} from './message';
+} from './message_types';
 
-import { Proposer, Receiver, Learner } from './roles';
+import Proposer from './proposer';
+import Receiver from './receiver';
+import Learner from './learner';
 
-
-export class PaxosNode {
+export default class PaxosNode {
   private id: number;
 
   private proposer: Proposer;
   private receiver: Receiver;
   private learner: Learner;
 
-  private nodeList: Array<PaxosNode>;
-
   constructor(id: number, numNodes: number) {
     this.id = id;
 
-    this.proposer = new Proposer(id, numNodes);
-    this.receiver = new Receiver();
-    this.learner = new Learner();
-
-    this.nodeList = [this];
+    this.proposer = new Proposer(id);
+    this.receiver = new Receiver(id);
+    this.learner = new Learner(id);
   }
 
-  initializeNodeList(nodeList: Array<PaxosNode>): void {
-    this.nodeList = nodeList;
+  initializeNodeIds(nodeIds: Array<number>): void {
+    this.proposer.initializeReceiverNodeIds(nodeIds);
+    this.learner.initializeReceiverNodeIds(nodeIds);
   }
 
   receiveMessage(message: Message): Array<Message> {
-    switch(message.kind) {
-      case 'PrepareStageRequest': return this.receivePrepareRequest(message);
-      case 'PrepareStageResponse': return this.receivePrepareResponse(message);
-      case 'AcceptStageRequest': return this.receiveAcceptRequest(message);
-      case 'AcceptStageResponse': return this.receiveAcceptResponse(message);
-      default: return [];
-    }
-  }
+    const proposerMessages = this.proposer.receiveMessage(message);
+    const receiverMessages = this.receiver.receiveMessage(message);
+    const learnerMessages = this.learner.receiveMessage(message);
 
-  // Phase 1 proposer
-  sendPrepareRequest(value: string): Array<Message> {
-    this.proposer.proposalNumber = this.proposer.getNewProposalNumber(this.receiver.highestSeenProposalNumber);
-    this.proposer.proposedValue = value;
-    this.proposer.responses = [];
-    this.proposer.isProposing = true;
+    if (proposerMessages.length > 0) {
+      // The proposer is initiating the accept stage.
+      const acceptRequestToSelf = proposerMessages.find((request) => request.toNodeId === this.id);
+      const acceptResponseToSelf = this.receiver.receiveMessage(acceptRequestToSelf!)[0];
+      this.learner.receiveMessage(acceptResponseToSelf);
 
-    this.proposer.responses.push({
-      kind: 'PrepareStageResponse',
-      toNode: this,
-      fromNode: this,
-      proposalNumber: this.receiver.highestSeenProposalNumber,
-      value: this.receiver.acceptedValue,
-    });
-
-    this.receiver.highestSeenProposalNumber = this.proposer.proposalNumber;
-
-    return this.nodeList
-      .filter((node: PaxosNode): boolean => node !== this)
-      .map((node: PaxosNode): PrepareStageRequest =>
-        <PrepareStageRequest>{
-          kind: 'PrepareStageRequest',
-          toNode: node,
-          fromNode: this,
-          proposalNumber: this.proposer.proposalNumber,
-        }
-      );
-  }
-
-  // Phase 1 proposer
-  receivePrepareResponse(message: PrepareStageResponse): Array<Message> {
-    if (!this.proposer.isProposing) {
-      return [];
+      return proposerMessages.filter((message) => message.toNodeId !== this.id);
     }
 
-    this.proposer.responses.push(message);
+    if (receiverMessages.length > 0) {
+      return receiverMessages;
+    }
 
-    if (this.proposer.responses.length > this.nodeList.length / 2) {
-      const importantMessage = this.proposer.responses.reduce((prevMessage, nextMessage) => {
-        return prevMessage.proposalNumber > nextMessage.proposalNumber ? prevMessage : nextMessage;
-      });
-      const { proposalNumber, value } = importantMessage;
-
-      if (proposalNumber > this.proposer.proposalNumber) {
-        this.proposer.isProposing = false;
-        return [];
-      }
-
-      if (value !== null) {
-        this.proposer.proposedValue = value;
-      }
-
-      return this.sendAcceptRequest();
+    if (learnerMessages.length > 0) {
+      return learnerMessages;
     }
 
     return [];
   }
 
-  // Phase 2 proposer
-  sendAcceptRequest(): Array<Message> {
-    this.learner.acceptedCount = 1;
-    return this.nodeList
-      .filter((node: PaxosNode): boolean => node !== this)
-      .map((node: PaxosNode): AcceptStageRequest =>
-        <AcceptStageRequest>{
-          kind: 'AcceptStageRequest',
-          toNode: node,
-          fromNode: this,
-          proposalNumber: this.proposer.proposalNumber,
-          value: this.proposer.proposedValue,
-        }
-      )
-  }
+  generatePrepareRequests(valueToPropose: string): Array<Message> {
+    const highestSeenProposalNumber = this.receiver.getHighestSeenProposalNumber();
+    const prepareRequests = this.proposer.generatePrepareRequests(valueToPropose, highestSeenProposalNumber);
 
-  // Phase 1 receiver
-  receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
-    const highestSeenProposalNumber = this.receiver.highestSeenProposalNumber;
-    const acceptedValue = this.receiver.acceptedValue;
+    const prepareRequestToSelf = prepareRequests.find((request) => request.toNodeId === this.id);
+    const prepareResponseToSelf = this.receiver.receiveMessage(prepareRequestToSelf!)[0];
+    this.proposer.receiveMessage(prepareResponseToSelf);
 
-    if (!this.receiver.highestSeenProposalNumber ||
-        message.proposalNumber > this.receiver.highestSeenProposalNumber) {
-      this.receiver.highestSeenProposalNumber = message.proposalNumber;
-      this.receiver.acceptedValue = null;
-    }
-
-    return [
-      <PrepareStageResponse>{
-        kind: 'PrepareStageResponse',
-        toNode: message.fromNode,
-        fromNode: this,
-        proposalNumber: highestSeenProposalNumber,
-        value: acceptedValue,
-      }
-    ];
-  }
-
-  // Phase 2 receiver
-  receiveAcceptRequest(message: AcceptStageRequest): Array<Message> {
-    if (!this.receiver.highestSeenProposalNumber ||
-        message.proposalNumber >= this.receiver.highestSeenProposalNumber) {
-      this.receiver.highestSeenProposalNumber = message.proposalNumber;
-      this.receiver.acceptedValue = message.value;
-    }
-    return [
-      <AcceptStageResponse>{
-        kind: 'AcceptStageResponse',
-        proposalNumber: this.receiver.highestSeenProposalNumber,
-      }
-    ];
-  }
-
-  // Phase 2 learner
-  receiveAcceptResponse(message: AcceptStageResponse): Array<Message> {
-    if (!this.proposer.isProposing) {
-      return [];
-    }
-
-    if (message.proposalNumber === this.proposer.proposalNumber) {
-      this.learner.acceptedCount += 1;
-    }
-
-    if (this.learner.acceptedCount > this.nodeList.length / 2) {
-      this.proposer.isProposing = false;
-      return [
-        <ChosenValueResponse>{
-          kind: 'ChosenValueResponse',
-          value: this.proposer.proposedValue,
-        }
-      ];
-    }
-
-    return [];
+    return prepareRequests.filter((request: PrepareStageRequest) => request.toNodeId !== this.id)
   }
 
   // Getter methods
   getId = () => this.id;
-  getProposalNumber = () => this.receiver.highestSeenProposalNumber;
-  isProposing = () => this.proposer.isProposing;
-  getAcceptedValue = () => this.receiver.acceptedValue;
-  getProposedValue = () => this.proposer.proposedValue;
-  getNumResponses = () => this.proposer.responses.length;
+  getProposalNumber = () => this.receiver.getHighestSeenProposalNumber();
+  isProposing = () => this.proposer.getIsProposing();
+  getAcceptedValue = () => this.receiver.getAcceptedValue();
+  getProposedValue = () => this.proposer.getProposedValue();
+  getNumResponses = () => this.proposer.getNumResponses();
 }

@@ -3,10 +3,9 @@ import * as React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
-import { Message } from './lib/message';
-
-import { PaxosNode } from './lib/paxos_node';
-import { MessagePool } from './lib/message_pool';
+import { Message } from './lib/message_types';
+import PaxosNode from './lib/paxos_node';
+import MessagePool from './lib/message_pool';
 import Paxos from './lib/paxos';
 
 import { MessagePoolContainer } from './MessagePoolContainer';
@@ -56,8 +55,8 @@ function getMessageStates(paxos: Paxos): Array<MessageState> {
     return {
       id: id,
       name: message.kind,
-      toNodeId: message.toNode.getId(),
-      fromNodeId: message.fromNode.getId(),
+      toNodeId: message.toNodeId,
+      fromNodeId: message.fromNodeId,
     };
   });
 }
@@ -74,27 +73,29 @@ class App extends React.Component<any, any> {
   }
 
   initiatePaxos = (nodeId: number, proposedValue: string): void => {
-    const node = this.state.paxos.nodes.find((node) => node.getId() == nodeId);
-    const messages = node.sendPrepareRequest(proposedValue);
-    messages.forEach((message) => {
-      this.state.paxos.messagePool.addMessage(message);
-    });
+    const { paxos } = this.state;
+
+    const node = paxos.getNodeById(nodeId);
+    const messages = node.generatePrepareRequests(proposedValue);
+    messages.forEach((message) => paxos.messagePool.addMessage(message));
+
     this.setState({
-      nodeStates: getNodeStates(this.state.paxos),
-      messageStates: getMessageStates(this.state.paxos),
+      nodeStates: getNodeStates(paxos),
+      messageStates: getMessageStates(paxos),
     });
   }
 
   deliverMessage = (messageId: String): void => {
-    const { messagePool } = this.state.paxos;
-    const message: Message = messagePool.retrieveMessage(messageId);
-    const responses = message.toNode.receiveMessage(message);
-    responses.forEach((response) => {
-      this.state.paxos.messagePool.addMessage(response);
-    });
+    const { paxos } = this.state;
+
+    const message: Message = paxos.messagePool.retrieveMessage(messageId);
+    const toNode = paxos.getNodeById(message.toNodeId);
+    const responses = toNode.receiveMessage(message);
+    responses.forEach((response) => paxos.messagePool.addMessage(response));
+
     this.setState({
-      nodeStates: getNodeStates(this.state.paxos),
-      messageStates: getMessageStates(this.state.paxos),
+      nodeStates: getNodeStates(paxos),
+      messageStates: getMessageStates(paxos),
     });
   }
 

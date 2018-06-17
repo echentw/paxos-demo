@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { Message } from './lib/message';
-import { PaxosNode } from './lib/paxos_node';
+import { Message } from './lib/message_types';
+import PaxosNode from './lib/paxos_node';
 import Paxos from './lib/paxos';
 
 import { NodeState } from './App';

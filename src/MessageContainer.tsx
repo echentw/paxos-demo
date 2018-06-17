@@ -7,7 +7,7 @@ import {
   PrepareStageResponse,
   AcceptStageRequest,
   AcceptStageResponse,
-} from './lib/message';
+} from './lib/message_types';
 
 import { MessageState } from './App';
 

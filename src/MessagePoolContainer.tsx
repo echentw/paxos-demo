@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { MessagePool, IdMessagePair } from './lib/message_pool';
+import MessagePool, { IdMessagePair } from './lib/message_pool';
 import Paxos from './lib/paxos';
 
 import { MessageState } from './App';

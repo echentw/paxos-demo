@@ -1,4 +1,4 @@
-import { Message } from './message';
+import { Message } from './message_types';
 
 
 export interface IdMessagePair {
@@ -6,7 +6,7 @@ export interface IdMessagePair {
   message: Message,
 }
 
-export class MessagePool {
+export default class MessagePool {
   public idMessagePairs: Array<IdMessagePair>;
 
   constructor() {
