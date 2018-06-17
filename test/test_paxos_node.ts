@@ -7,9 +7,9 @@ import {
   AcceptStageRequest,
   AcceptStageResponse,
   ChosenValueResponse,
-} from '../src/lib/message';
+} from '../src/lib/message_types';
 
-import { PaxosNode } from '../src/lib/paxos_node';
+import PaxosNode from '../src/lib/paxos_node';
 
 
 describe('PaxosNode', () => {
@@ -23,13 +23,13 @@ describe('PaxosNode', () => {
       new PaxosNode(3, 5),
       new PaxosNode(4, 5),
     ];
-    nodes.forEach((node) => node.initializeNodeList(nodes));
+    nodes.forEach((node) => node.initializeNodeIds(nodes.map((node) => node.getId())));
   });
 
   describe('Proposer', () => {
     describe('Phase 1', () => {
       it('should send a prepare message to everyone', () => {
-        const requests: Array<Message> = nodes[0].sendPrepareRequest('juicy juicy burger');
+        const requests: Array<Message> = nodes[0].generatePrepareRequests('juicy juicy burger');
         assert.lengthOf(requests, 4);
         assert.hasAllKeys(new Set(requests.map(r => r.toNode)), nodes.slice(1, 5));
       });
