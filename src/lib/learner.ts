@@ -14,7 +14,7 @@ export default class Learner extends PaxosRole {
 
   private proposalNumber: number;
   private responses: Array<AcceptStageResponse>;
-  private learnedValue: string;
+  private learnedValue: string | null;
 
   constructor(id: number) {
     super();
@@ -46,7 +46,7 @@ export default class Learner extends PaxosRole {
     if (message.highestSeenProposalNumber > this.proposalNumber) {
       this.proposalNumber = message.highestSeenProposalNumber;
       this.responses = [];
-      this.learnedValue = '';
+      this.learnedValue = null
     }
 
     this.responses.push(message);
@@ -56,4 +56,7 @@ export default class Learner extends PaxosRole {
 
     return [];
   }
+
+  getId = () => this.id;
+  getLearnedValue = () => this.learnedValue;
 }
