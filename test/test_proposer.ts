@@ -30,7 +30,7 @@ describe('Proposer', () => {
 
     it('should create a higher proposal number than the one passed in', () => {
       const requests1: Array<PrepareStageRequest> = proposer.generatePrepareRequests('french fries', 10);
-      assert(requests1[0].proposalNumber > 10);
+      assert.isAbove(requests1[0].proposalNumber, 10);
     });
   });
 
@@ -39,7 +39,7 @@ describe('Proposer', () => {
 
     beforeEach(() => {
       const requests = proposer.generatePrepareRequests('milk shake', 10);
-      assert(proposer.getIsProposing());
+      assert.isTrue(proposer.getIsProposing());
       proposalNumber = requests[0].proposalNumber;
     });
 
@@ -50,7 +50,7 @@ describe('Proposer', () => {
         fromNodeId: 123123,
         proposalNumber: proposalNumber - 1,
       });
-      assert(proposer.getIsProposing());
+      assert.isTrue(proposer.getIsProposing());
     });
 
     it('should stop proposing if the proposal # is higher', () => {
@@ -60,7 +60,7 @@ describe('Proposer', () => {
         fromNodeId: 123123,
         proposalNumber: proposalNumber + 1,
       });
-      assert(!proposer.getIsProposing());
+      assert.isFalse(proposer.getIsProposing());
     });
   });
 
@@ -77,10 +77,10 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123123,
-        highestSeenProposalNumber: proposalNumber + 1,
+        previouslyHighestSeenProposalNumber: proposalNumber + 1,
         previouslyAcceptedValue: null,
       });
-      assert(!proposer.getIsProposing());
+      assert.isFalse(proposer.getIsProposing());
     });
 
     it('should not initiate accept phase before it gets quorum', () => {
@@ -88,7 +88,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123123,
-        highestSeenProposalNumber: proposalNumber - 1,
+        previouslyHighestSeenProposalNumber: proposalNumber - 1,
         previouslyAcceptedValue: null,
       });
 
@@ -96,7 +96,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123124,
-        highestSeenProposalNumber: proposalNumber - 1,
+        previouslyHighestSeenProposalNumber: proposalNumber - 1,
         previouslyAcceptedValue: null,
       });
 
@@ -109,7 +109,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123123,
-        highestSeenProposalNumber: proposalNumber - 1,
+        previouslyHighestSeenProposalNumber: proposalNumber - 1,
         previouslyAcceptedValue: null,
       });
 
@@ -117,7 +117,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123124,
-        highestSeenProposalNumber: proposalNumber - 1,
+        previouslyHighestSeenProposalNumber: proposalNumber - 1,
         previouslyAcceptedValue: null,
       });
 
@@ -125,7 +125,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123125,
-        highestSeenProposalNumber: proposalNumber - 1,
+        previouslyHighestSeenProposalNumber: proposalNumber - 1,
         previouslyAcceptedValue: null,
       });
 
@@ -137,7 +137,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123123,
-        highestSeenProposalNumber: proposalNumber - 2,
+        previouslyHighestSeenProposalNumber: proposalNumber - 2,
         previouslyAcceptedValue: 'bulbasaur',
       });
 
@@ -145,7 +145,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123124,
-        highestSeenProposalNumber: proposalNumber - 1,
+        previouslyHighestSeenProposalNumber: proposalNumber - 1,
         previouslyAcceptedValue: 'charmander',
       });
 
@@ -153,12 +153,12 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123125,
-        highestSeenProposalNumber: proposalNumber - 3,
+        previouslyHighestSeenProposalNumber: proposalNumber - 3,
         previouslyAcceptedValue: 'squirtle',
       });
 
       assert.lengthOf(messages, receiverIds.length);
-      assert(messages[0].proposedValue === 'charmander');
+      assert.equal(messages[0].proposedValue, 'charmander');
     });
 
     it('should propose its own value if there are no previously accepted values', () => {
@@ -166,7 +166,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123123,
-        highestSeenProposalNumber: proposalNumber - 2,
+        previouslyHighestSeenProposalNumber: proposalNumber - 2,
         previouslyAcceptedValue: null,
       });
 
@@ -174,7 +174,7 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123124,
-        highestSeenProposalNumber: proposalNumber - 1,
+        previouslyHighestSeenProposalNumber: proposalNumber - 1,
         previouslyAcceptedValue: null,
       });
 
@@ -182,12 +182,12 @@ describe('Proposer', () => {
         kind: 'PrepareStageResponse',
         toNodeId: proposer.getId(),
         fromNodeId: 123125,
-        highestSeenProposalNumber: proposalNumber - 3,
+        previouslyHighestSeenProposalNumber: proposalNumber - 3,
         previouslyAcceptedValue: null,
       });
 
       assert.lengthOf(messages, receiverIds.length);
-      assert(messages[0].proposedValue === 'dinosaur');
+      assert.equal(messages[0].proposedValue, 'dinosaur');
     });
   });
 
@@ -207,7 +207,7 @@ describe('Proposer', () => {
         proposalNumber: proposalNumber - 1,
         proposedValue: 'hello',
       });
-      assert(proposer.getIsProposing());
+      assert.isTrue(proposer.getIsProposing());
     });
 
     it('should stop proposing if the proposal number is higher', () => {
@@ -218,7 +218,7 @@ describe('Proposer', () => {
         proposalNumber: proposalNumber + 1,
         proposedValue: 'hello',
       });
-      assert(!proposer.getIsProposing());
+      assert.isFalse(proposer.getIsProposing());
     });
   });
 
