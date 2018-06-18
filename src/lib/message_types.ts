@@ -11,7 +11,7 @@ export interface PrepareStageRequest extends MessageBase {
 
 export interface PrepareStageResponse extends MessageBase {
   kind: 'PrepareStageResponse',
-  highestSeenProposalNumber: number;
+  previouslyHighestSeenProposalNumber: number;
   previouslyAcceptedValue: string | null;
 }
 

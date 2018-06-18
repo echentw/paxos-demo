@@ -26,6 +26,8 @@ export default class Receiver extends PaxosRole {
   }
 
   protected receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
+    const previouslyHighestSeenProposalNumber = this.highestSeenProposalNumber;
+    const previouslyAcceptedValue = this.acceptedValue;
     if (message.proposalNumber > this.highestSeenProposalNumber) {
       this.highestSeenProposalNumber = message.proposalNumber;
       this.acceptedValue = '';
@@ -35,8 +37,8 @@ export default class Receiver extends PaxosRole {
         kind: 'PrepareStageResponse',
         toNodeId: message.fromNodeId,
         fromNodeId: this.id,
-        highestSeenProposalNumber: this.highestSeenProposalNumber,
-        previouslyAcceptedValue: this.acceptedValue,
+        previouslyHighestSeenProposalNumber: previouslyHighestSeenProposalNumber,
+        previouslyAcceptedValue: previouslyAcceptedValue,
       }
     ];
   };

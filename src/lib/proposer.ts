@@ -27,7 +27,7 @@ export default class Proposer extends PaxosRole {
     this.receiverNodeIds = receiverNodeIds;
   }
 
-  generatePrepareRequests(value: string, proposalNumberToBeat: number): Array<Message> {
+  generatePrepareRequests(value: string, proposalNumberToBeat: number): Array<PrepareStageRequest> {
     this.proposalNumber = this.getNewProposalNumber(proposalNumberToBeat);
     this.proposedValue = value;
     this.responses = [];
@@ -70,10 +70,7 @@ export default class Proposer extends PaxosRole {
     if (!this.isProposing) {
       return [];
     }
-    if (message.highestSeenProposalNumber < this.proposalNumber) {
-      return [];
-    }
-    if (message.highestSeenProposalNumber > this.proposalNumber) {
+    if (message.previouslyHighestSeenProposalNumber > this.proposalNumber) {
       this.reset();
       return [];
     }
@@ -88,10 +85,10 @@ export default class Proposer extends PaxosRole {
     // Majority of receiver nodes have acknowledged the prepare request!
     const messageWithHighestProposalNumber = this.responses
       .reduce((prevMessage, nextMessage) =>
-        prevMessage.highestSeenProposalNumber > nextMessage.highestSeenProposalNumber
+        prevMessage.previouslyHighestSeenProposalNumber > nextMessage.previouslyHighestSeenProposalNumber
         ? prevMessage : nextMessage
       );
-    const { highestSeenProposalNumber, previouslyAcceptedValue } = messageWithHighestProposalNumber;
+    const { previouslyHighestSeenProposalNumber, previouslyAcceptedValue } = messageWithHighestProposalNumber;
     if (previouslyAcceptedValue !== null) {
       this.proposedValue = previouslyAcceptedValue;
     }
@@ -123,6 +120,7 @@ export default class Proposer extends PaxosRole {
     return [];
   }
 
+  getId = () => this.id;
   getIsProposing = () => this.isProposing;
   getProposedValue = () => this.proposedValue;
   getNumResponses = () => this.responses.length;
