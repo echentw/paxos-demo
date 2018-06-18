@@ -12,17 +12,13 @@ export default class Receiver extends PaxosRole {
   private id: number;
 
   private highestSeenProposalNumber: number;
-  private acceptedValue: string;
+  private acceptedValue: string | null;
 
   constructor(id: number) {
     super();
     this.id = id;
     this.highestSeenProposalNumber = -1;
-    this.acceptedValue = '';
-  }
-
-  getHighestSeenProposalNumber(): number {
-    return this.highestSeenProposalNumber;
+    this.acceptedValue = null;
   }
 
   protected receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
@@ -30,7 +26,7 @@ export default class Receiver extends PaxosRole {
     const previouslyAcceptedValue = this.acceptedValue;
     if (message.proposalNumber > this.highestSeenProposalNumber) {
       this.highestSeenProposalNumber = message.proposalNumber;
-      this.acceptedValue = '';
+      this.acceptedValue = null;
     }
     return [
       <PrepareStageResponse>{
@@ -67,5 +63,7 @@ export default class Receiver extends PaxosRole {
     return [];
   }
 
+  getId = () => this.id;
   getAcceptedValue = () => this.acceptedValue;
+  getHighestSeenProposalNumber = () => this.highestSeenProposalNumber;
 }
