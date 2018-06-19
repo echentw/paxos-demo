@@ -15,7 +15,7 @@ const messageDragSource = {
   beginDrag(props) {
     return {
       messageId: props.messageState.id,
-      toNodeId: props.messageState.toNodeId,
+      toNodeId: props.messageState.message.toNodeId,
     };
   },
 
@@ -47,17 +47,19 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
 
   render() {
     const { connectDragSource, isDragging, messageState } = this.props;
-    const { id, name, toNodeId, fromNodeId } = messageState;
+    const { id, message } = messageState;
+    const { kind, toNodeId, fromNodeId } = message;
     const classes = isDragging ? 'message is-dragging' : 'message';
     let component;
-    switch(name) {
+    switch(kind) {
       case 'PrepareStageRequest': {
+        const prepareRequest = message as PrepareStageRequest;
         component = (
           <div className={classes} id={id}>
             <div className="message-kind">Prepare Request</div>
             <div className="message-from">From: #{fromNodeId}</div>
             <div className="message-to">To: #{toNodeId}</div>
-            <div className="message-proposal-number">Proposal #TODO</div>
+            <div className="message-proposal-number">Proposal #{prepareRequest.proposalNumber}</div>
           </div>
         );
         break;

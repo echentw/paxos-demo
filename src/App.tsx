@@ -13,10 +13,7 @@ import NodeClusterComponent from './NodeClusterComponent';
 
 export interface MessageState {
   id: string;
-  name: string;
-  toNodeId: number;
-  fromNodeId: number;
-  // proposalNumber: number;
+  message: Message;
 }
 
 export interface NodeState {
@@ -54,9 +51,7 @@ function getMessageStates(paxos: Paxos): Array<MessageState> {
     const { id, message } = pair;
     return {
       id: id,
-      name: message.kind,
-      toNodeId: message.toNodeId,
-      fromNodeId: message.fromNodeId,
+      message: message,
     };
   });
 }
