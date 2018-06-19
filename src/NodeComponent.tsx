@@ -27,7 +27,7 @@ function collect(connect, monitor) {
   };
 }
 
-interface NodeContainerProps {
+interface NodeComponentProps {
   nodeState: NodeState;
   initiatePaxos: (nodeId: number, proposedValue: string) => void;
   paxos: Paxos;
@@ -35,8 +35,8 @@ interface NodeContainerProps {
   isOver: boolean,
 }
 
-class NodeContainer extends React.Component<NodeContainerProps, {}> {
-  constructor(props: NodeContainerProps) {
+class NodeComponent extends React.Component<NodeComponentProps, {}> {
+  constructor(props: NodeComponentProps) {
     super(props);
   }
 
@@ -68,4 +68,4 @@ class NodeContainer extends React.Component<NodeContainerProps, {}> {
   }
 }
 
-export default DropTarget('message', nodeDropTarget, collect)(NodeContainer);
+export default DropTarget('message', nodeDropTarget, collect)(NodeComponent);

@@ -33,15 +33,15 @@ function collect(connect, monitor) {
   };
 }
 
-interface MessageContainerProps {
+interface MessageComponentProps {
   messageState: MessageState,
   deliverMessage: (messageId: String) => void;
   connectDragSource: Function,
   isDragging: boolean,
 }
 
-class MessageContainer extends React.Component<MessageContainerProps, {}> {
-  constructor(props: MessageContainerProps) {
+class MessageComponent extends React.Component<MessageComponentProps, {}> {
+  constructor(props: MessageComponentProps) {
     super(props);
   }
 
@@ -81,4 +81,4 @@ class MessageContainer extends React.Component<MessageContainerProps, {}> {
   }
 }
 
-export default DragSource('message', messageDragSource, collect)(MessageContainer);
+export default DragSource('message', messageDragSource, collect)(MessageComponent);

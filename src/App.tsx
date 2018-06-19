@@ -8,8 +8,8 @@ import PaxosNode from './lib/paxos_node';
 import MessagePool from './lib/message_pool';
 import Paxos from './lib/paxos';
 
-import { MessagePoolContainer } from './MessagePoolContainer';
-import { NodeClusterContainer } from './NodeClusterContainer';
+import MessagePoolComponent from './MessagePoolComponent';
+import NodeClusterComponent from './NodeClusterComponent';
 
 export interface MessageState {
   id: string;
@@ -102,12 +102,12 @@ class App extends React.Component<any, any> {
   render() {
     return (
       <div className="container">
-        <NodeClusterContainer
+        <NodeClusterComponent
           paxos={this.state.paxos}
           initiatePaxos={this.initiatePaxos}
           nodeStates={this.state.nodeStates}
         />
-        <MessagePoolContainer
+        <MessagePoolComponent
           paxos={this.state.paxos}
           deliverMessage={this.deliverMessage}
           messageStates={this.state.messageStates}

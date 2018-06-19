@@ -5,24 +5,24 @@ import Paxos from './lib/paxos';
 
 import { MessageState } from './App';
 
-import MessageContainer from './MessageContainer';
+import MessageComponent from './MessageComponent';
 
 
-interface MessagePoolContainerProps {
+interface MessagePoolComponentProps {
   paxos: Paxos;
   messageStates: Array<MessageState>;
   deliverMessage: (messageId: String) => void;
 }
 
-export class MessagePoolContainer extends React.Component<MessagePoolContainerProps, {}> {
-  constructor(props: MessagePoolContainerProps) {
+export default class MessagePoolComponent extends React.Component<MessagePoolComponentProps, {}> {
+  constructor(props: MessagePoolComponentProps) {
     super(props);
   }
 
   render() {
     const { messageStates } = this.props;
-    const messageContainers = messageStates.map((messageState) => 
-      <MessageContainer
+    const messageComponents = messageStates.map((messageState) => 
+      <MessageComponent
         messageState={messageState}
         deliverMessage={this.props.deliverMessage}
       />
@@ -30,7 +30,7 @@ export class MessagePoolContainer extends React.Component<MessagePoolContainerPr
 
     return (
       <div className="message-pool-container">
-        {messageContainers}
+        {messageComponents}
       </div>
     );
   }

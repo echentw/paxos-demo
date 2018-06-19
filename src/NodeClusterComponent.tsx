@@ -6,24 +6,24 @@ import Paxos from './lib/paxos';
 
 import { NodeState } from './App';
 
-import NodeContainer from './NodeContainer';
+import NodeComponent from './NodeComponent';
 
 
-interface NodeClusterContainerProps {
+interface NodeClusterComponentProps {
   paxos: Paxos;
   nodeStates: Array<NodeState>;
   initiatePaxos: (nodeId: number, proposedValue: string) => void;
 }
 
-export class NodeClusterContainer extends React.Component<NodeClusterContainerProps, {}> {
-  constructor(props: NodeClusterContainerProps) {
+export default class NodeClusterComponent extends React.Component<NodeClusterComponentProps, {}> {
+  constructor(props: NodeClusterComponentProps) {
     super(props);
   }
 
   render() {
     const { nodeStates } = this.props;
-    const nodeContainers = nodeStates.map((nodeState) =>
-      <NodeContainer
+    const nodeComponents = nodeStates.map((nodeState) =>
+      <NodeComponent
         nodeState={nodeState}
         initiatePaxos={this.props.initiatePaxos}
         paxos={this.props.paxos}
@@ -31,7 +31,7 @@ export class NodeClusterContainer extends React.Component<NodeClusterContainerPr
     );
     return (
       <div className="nodes-container">
-        {nodeContainers}
+        {nodeComponents}
       </div>
     );
   }
