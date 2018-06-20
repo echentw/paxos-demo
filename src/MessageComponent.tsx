@@ -56,24 +56,49 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
         const prepareRequest = message as PrepareStageRequest;
         component = (
           <div className={classes} id={id}>
-            <div className="message-kind">Prepare Request</div>
-            <div className="message-from">From: #{fromNodeId}</div>
-            <div className="message-to">To: #{toNodeId}</div>
-            <div className="message-proposal-number">Proposal #{prepareRequest.proposalNumber}</div>
+            <div className="message-text">Prepare Request</div>
+            <div className="message-text">From: #{fromNodeId}</div>
+            <div className="message-text">To: #{toNodeId}</div>
+            <div className="message-text">Proposal #{prepareRequest.proposalNumber}</div>
           </div>
         );
         break;
       }
       case 'PrepareStageResponse': {
-        // TODO: handle this case
-      }
-      case 'AcceptStageRequest': {
-        // TODO: handle this case
-      }
-      case 'AcceptStageResponse': {
-        // TODO: handle this case
+        const prepareResponse = message as PrepareStageResponse;
         component = (
           <div className={classes} id={id}>
+            <div className="message-text">Prepare Response</div>
+            <div className="message-text">From: #{fromNodeId}</div>
+            <div className="message-text">To: #{toNodeId}</div>
+            <div className="message-text">Proposal #{prepareResponse.previouslyHighestSeenProposalNumber}</div>
+            <div className="message-text">Accepted value: {prepareResponse.previouslyAcceptedValue}</div>
+          </div>
+        );
+        break;
+      }
+      case 'AcceptStageRequest': {
+        const acceptRequest = message as AcceptStageRequest;
+        component = (
+          <div className={classes} id={id}>
+            <div className="message-text">Prepare Response</div>
+            <div className="message-text">From: #{fromNodeId}</div>
+            <div className="message-text">To: #{toNodeId}</div>
+            <div className="message-text">Proposal #: #{acceptRequest.proposalNumber}</div>
+            <div className="message-text">Proposed Value: {acceptRequest.proposedValue}</div>
+          </div>
+        );
+        break;
+      }
+      case 'AcceptStageResponse': {
+        const acceptResponse = message as AcceptStageResponse;
+        component = (
+          <div className={classes} id={id}>
+            <div className="message-text">Prepare Response</div>
+            <div className="message-text">From: #{fromNodeId}</div>
+            <div className="message-text">To: #{toNodeId}</div>
+            <div className="message-text">Proposal #: #{acceptResponse.highestSeenProposalNumber}</div>
+            <div className="message-text">Accepted Value: {acceptResponse.acceptedValue}</div>
           </div>
         );
         break;

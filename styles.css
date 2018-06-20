@@ -56,15 +56,7 @@
   opacity: 0.0;
 }
 
-.message-kind {
-  font-size: 12px;
-}
-
-.message-from {
-  font-size: 12px;
-}
-
-.message-to {
+.message-text {
   font-size: 12px;
 }
 
