@@ -1,8 +1,8 @@
 import {
-  PrepareStageRequest,
-  PrepareStageResponse,
-  AcceptStageRequest,
-  AcceptStageResponse,
+  PrepareRequest,
+  PrepareResponse,
+  AcceptRequest,
+  AcceptResponse,
   Message,
 } from './message_types';
 
@@ -13,7 +13,7 @@ export default class Learner extends PaxosRole {
   private receiverNodeIds: Array<number>;
 
   private proposalNumber: number;
-  private responses: Array<AcceptStageResponse>;
+  private responses: Array<AcceptResponse>;
   private learnedValue: string | null;
 
   constructor(id: number) {
@@ -27,32 +27,35 @@ export default class Learner extends PaxosRole {
     this.receiverNodeIds = receiverNodeIds;
   }
 
-  protected receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
+  protected receivePrepareRequest(message: PrepareRequest): Array<Message> {
     return [];
   }
 
-  protected receivePrepareResponse(message: PrepareStageResponse): Array<Message> {
+  protected receivePrepareResponse(message: PrepareResponse): Array<Message> {
     return [];
   }
 
-  protected receiveAcceptRequest(message: AcceptStageRequest): Array<Message> {
+  protected receiveAcceptRequest(message: AcceptRequest): Array<Message> {
     return [];
   }
 
-  protected receiveAcceptResponse(message: AcceptStageResponse): Array<Message> {
-    if (message.proposalNumber < this.proposalNumber) {
+  // TODO: rethink how to implement this method
+  protected receiveAcceptResponse(message: AcceptResponse): Array<Message> {
+    const { headers, body } = message;
+
+    if (headers.proposalNumber < this.proposalNumber) {
       return [];
     }
 
-    if (message.proposalNumber > this.proposalNumber) {
-      this.proposalNumber = message.proposalNumber;
+    if (headers.proposalNumber > this.proposalNumber) {
+      this.proposalNumber = headers.proposalNumber;
       this.responses = [];
       this.learnedValue = null
     }
 
     this.responses.push(message);
     if (this.responses.length > this.receiverNodeIds.length / 2) {
-      this.learnedValue = this.responses[0].acceptedValue;
+      this.learnedValue = this.responses[0].body.acceptedValue;
     }
 
     return [];

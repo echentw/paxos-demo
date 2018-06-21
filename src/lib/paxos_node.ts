@@ -1,8 +1,8 @@
 import {
-  PrepareStageRequest,
-  PrepareStageResponse,
-  AcceptStageRequest,
-  AcceptStageResponse,
+  PrepareRequest,
+  PrepareResponse,
+  AcceptRequest,
+  AcceptResponse,
   Message,
 } from './message_types';
 
@@ -37,11 +37,11 @@ export default class PaxosNode {
 
     if (proposerMessages.length > 0) {
       // The proposer is initiating the accept stage.
-      const acceptRequestToSelf = proposerMessages.find((request) => request.toNodeId === this.id);
+      const acceptRequestToSelf = proposerMessages.find((request) => request.headers.toNodeId === this.id);
       const acceptResponseToSelf = this.receiver.receiveMessage(acceptRequestToSelf!)[0];
       this.learner.receiveMessage(acceptResponseToSelf);
 
-      return proposerMessages.filter((message) => message.toNodeId !== this.id);
+      return proposerMessages.filter((message) => message.headers.toNodeId !== this.id);
     }
 
     if (receiverMessages.length > 0) {
@@ -59,11 +59,11 @@ export default class PaxosNode {
     const highestSeenProposalNumber = this.receiver.getHighestSeenProposalNumber();
     const prepareRequests = this.proposer.generatePrepareRequests(valueToPropose, highestSeenProposalNumber);
 
-    const prepareRequestToSelf = prepareRequests.find((request) => request.toNodeId === this.id);
+    const prepareRequestToSelf = prepareRequests.find((request) => request.headers.toNodeId === this.id);
     const prepareResponseToSelf = this.receiver.receiveMessage(prepareRequestToSelf!)[0];
     this.proposer.receiveMessage(prepareResponseToSelf);
 
-    return prepareRequests.filter((request: PrepareStageRequest) => request.toNodeId !== this.id)
+    return prepareRequests.filter((request: PrepareRequest) => request.headers.toNodeId !== this.id)
   }
 
   // getter methods

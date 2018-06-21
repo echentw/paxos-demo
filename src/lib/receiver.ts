@@ -1,8 +1,8 @@
 import {
-  PrepareStageRequest,
-  PrepareStageResponse,
-  AcceptStageRequest,
-  AcceptStageResponse,
+  PrepareRequest,
+  PrepareResponse,
+  AcceptRequest,
+  AcceptResponse,
   Message,
 } from './message_types';
 
@@ -21,50 +21,64 @@ export default class Receiver extends PaxosRole {
     this.acceptedValue = null;
   }
 
-  protected receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
+  protected receivePrepareRequest(message: PrepareRequest): Array<Message> {
+    const { headers } = message;
+
     const highestSeenProposalNumber = this.highestSeenProposalNumber;
     const acceptedValue = this.acceptedValue;
-    if (message.proposalNumber > this.highestSeenProposalNumber) {
-      this.highestSeenProposalNumber = message.proposalNumber;
+
+    if (headers.proposalNumber > this.highestSeenProposalNumber) {
+      this.highestSeenProposalNumber = headers.proposalNumber;
       this.acceptedValue = null;
     }
+
     return [
-      <PrepareStageResponse>{
-        kind: 'PrepareStageResponse',
-        toNodeId: message.fromNodeId,
-        fromNodeId: this.id,
-        proposalNumber: message.proposalNumber,
-        highestSeenProposalNumber: highestSeenProposalNumber,
-        acceptedValue: acceptedValue,
+      <PrepareResponse>{
+        kind: 'PrepareResponse',
+        headers: {
+          toNodeId: headers.fromNodeId,
+          fromNodeId: this.id,
+          proposalNumber: headers.proposalNumber,
+        },
+        body: {
+          highestSeenProposalNumber: highestSeenProposalNumber,
+          acceptedValue: acceptedValue,
+        },
       }
     ];
   };
 
-  protected receivePrepareResponse(message: PrepareStageResponse): Array<Message> {
+  protected receivePrepareResponse(message: PrepareResponse): Array<Message> {
     return [];
   }
 
-  protected receiveAcceptRequest(message: AcceptStageRequest): Array<Message> {
+  protected receiveAcceptRequest(message: AcceptRequest): Array<Message> {
+    const { headers, body } = message;
+
     let accepted = false;
-    if (message.proposalNumber >= this.highestSeenProposalNumber) {
-      this.highestSeenProposalNumber = message.proposalNumber;
-      this.acceptedValue = message.proposedValue;
+    if (headers.proposalNumber >= this.highestSeenProposalNumber) {
+      this.highestSeenProposalNumber = headers.proposalNumber;
+      this.acceptedValue = body.proposedValue;
       accepted = true;
     }
     return [
-      <AcceptStageResponse>{
-        kind: 'AcceptStageResponse',
-        toNodeId: message.fromNodeId,
-        fromNodeId: this.id,
-        proposalNumber: message.proposalNumber,
-        accepted: accepted,
-        highestSeenProposalNumber: this.highestSeenProposalNumber,
-        acceptedValue: accepted ? this.acceptedValue : null,
+      <AcceptResponse>{
+        kind: 'AcceptResponse',
+        headers: {
+          toNodeId: headers.fromNodeId,
+          fromNodeId: this.id,
+          proposalNumber: headers.proposalNumber,
+        },
+        body: {
+          accepted: accepted,
+          highestSeenProposalNumber: this.highestSeenProposalNumber,
+          acceptedValue: accepted ? this.acceptedValue : null,
+        },
       }
     ];
   }
 
-  protected receiveAcceptResponse(message: AcceptStageResponse): Array<Message> {
+  protected receiveAcceptResponse(message: AcceptResponse): Array<Message> {
     return [];
   }
 

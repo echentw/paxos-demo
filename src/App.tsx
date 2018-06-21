@@ -110,7 +110,7 @@ class App extends React.Component<any, any> {
     const { paxos } = this.state;
 
     const message: Message = paxos.messagePool.retrieveMessage(messageId);
-    const toNode = paxos.getNodeById(message.toNodeId);
+    const toNode = paxos.getNodeById(message.headers.toNodeId);
     const responses = toNode.receiveMessage(message);
     responses.forEach((response) => paxos.messagePool.addMessage(response));
 

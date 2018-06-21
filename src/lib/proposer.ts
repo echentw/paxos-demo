@@ -1,8 +1,8 @@
 import {
-  PrepareStageRequest,
-  PrepareStageResponse,
-  AcceptStageRequest,
-  AcceptStageResponse,
+  PrepareRequest,
+  PrepareResponse,
+  AcceptRequest,
+  AcceptResponse,
   Message,
 } from './message_types';
 
@@ -14,7 +14,7 @@ export default class Proposer extends PaxosRole {
 
   private proposalNumber: number;
   private proposedValue: string;
-  private responses: Array<PrepareStageResponse>;
+  private responses: Array<PrepareResponse>;
   private isProposing: boolean;
 
   private initiatedAcceptPhase: boolean;
@@ -29,19 +29,22 @@ export default class Proposer extends PaxosRole {
     this.receiverNodeIds = receiverNodeIds;
   }
 
-  generatePrepareRequests(value: string, proposalNumberToBeat: number): Array<PrepareStageRequest> {
+  generatePrepareRequests(value: string, proposalNumberToBeat: number): Array<PrepareRequest> {
     this.proposalNumber = this.getNewProposalNumber(proposalNumberToBeat);
     this.proposedValue = value;
     this.responses = [];
     this.isProposing = true;
 
     return this.receiverNodeIds
-      .map((nodeId: number): PrepareStageRequest =>
-        <PrepareStageRequest>{
-          kind: 'PrepareStageRequest',
-          toNodeId: nodeId,
-          fromNodeId: this.id,
-          proposalNumber: this.proposalNumber,
+      .map((nodeId: number): PrepareRequest =>
+        <PrepareRequest>{
+          kind: 'PrepareRequest',
+          headers: {
+            toNodeId: nodeId,
+            fromNodeId: this.id,
+            proposalNumber: this.proposalNumber,
+          },
+          body: {},
         }
       );
   }
@@ -62,20 +65,22 @@ export default class Proposer extends PaxosRole {
     return (Math.floor(proposalNumberToBeat / numNodes) + 1) * numNodes + this.id;
   }
 
-  protected receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
-    if (message.proposalNumber > this.proposalNumber) {
+  protected receivePrepareRequest(message: PrepareRequest): Array<Message> {
+    if (message.headers.proposalNumber > this.proposalNumber) {
       this.reset();
     }
     return [];
   };
 
-  protected receivePrepareResponse(message: PrepareStageResponse): Array<Message> {
+  protected receivePrepareResponse(message: PrepareResponse): Array<Message> {
+    const { headers, body } = message;
+
     if (!this.isProposing ||
         this.initiatedAcceptPhase ||
-        message.proposalNumber !== this.proposalNumber) {
+        headers.proposalNumber !== this.proposalNumber) {
       return [];
     }
-    if (message.highestSeenProposalNumber > this.proposalNumber) {
+    if (body.highestSeenProposalNumber > this.proposalNumber) {
       this.reset();
       return [];
     }
@@ -92,10 +97,10 @@ export default class Proposer extends PaxosRole {
 
     const messageWithHighestProposalNumber = this.responses
       .reduce((prevMessage, nextMessage) =>
-        prevMessage.highestSeenProposalNumber > nextMessage.highestSeenProposalNumber
+        prevMessage.body.highestSeenProposalNumber > nextMessage.body.highestSeenProposalNumber
         ? prevMessage : nextMessage
       );
-    const { highestSeenProposalNumber, acceptedValue } = messageWithHighestProposalNumber;
+    const { highestSeenProposalNumber, acceptedValue } = messageWithHighestProposalNumber.body;
     if (acceptedValue != null) {
       this.proposedValue = acceptedValue;
     }
@@ -103,26 +108,30 @@ export default class Proposer extends PaxosRole {
   }
 
   private generateAcceptRequests(): Array<Message> {
-    return this.receiverNodeIds.map((nodeId: number): AcceptStageRequest =>
-      <AcceptStageRequest>{
-        kind: 'AcceptStageRequest',
-        toNodeId: nodeId,
-        fromNodeId: this.id,
-        proposalNumber: this.proposalNumber,
-        proposedValue: this.proposedValue,
+    return this.receiverNodeIds.map((nodeId: number): AcceptRequest =>
+      <AcceptRequest>{
+        kind: 'AcceptRequest',
+        headers: {
+          toNodeId: nodeId,
+          fromNodeId: this.id,
+          proposalNumber: this.proposalNumber,
+        },
+        body: {
+          proposedValue: this.proposedValue,
+        },
       }
     );
   }
 
-  protected receiveAcceptRequest(message: AcceptStageRequest): Array<Message> {
-    if (message.proposalNumber > this.proposalNumber) {
+  protected receiveAcceptRequest(message: AcceptRequest): Array<Message> {
+    if (message.headers.proposalNumber > this.proposalNumber) {
       this.reset();
     }
     return [];
   }
 
-  protected receiveAcceptResponse(message: AcceptStageResponse): Array<Message> {
-    if (message.highestSeenProposalNumber > this.proposalNumber) {
+  protected receiveAcceptResponse(message: AcceptResponse): Array<Message> {
+    if (message.body.highestSeenProposalNumber > this.proposalNumber) {
       this.reset();
     }
     return [];
