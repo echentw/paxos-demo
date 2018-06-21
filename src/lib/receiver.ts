@@ -22,8 +22,8 @@ export default class Receiver extends PaxosRole {
   }
 
   protected receivePrepareRequest(message: PrepareStageRequest): Array<Message> {
-    const previouslyHighestSeenProposalNumber = this.highestSeenProposalNumber;
-    const previouslyAcceptedValue = this.acceptedValue;
+    const highestSeenProposalNumber = this.highestSeenProposalNumber;
+    const acceptedValue = this.acceptedValue;
     if (message.proposalNumber > this.highestSeenProposalNumber) {
       this.highestSeenProposalNumber = message.proposalNumber;
       this.acceptedValue = null;
@@ -33,8 +33,9 @@ export default class Receiver extends PaxosRole {
         kind: 'PrepareStageResponse',
         toNodeId: message.fromNodeId,
         fromNodeId: this.id,
-        previouslyHighestSeenProposalNumber: previouslyHighestSeenProposalNumber,
-        previouslyAcceptedValue: previouslyAcceptedValue,
+        proposalNumber: message.proposalNumber,
+        highestSeenProposalNumber: highestSeenProposalNumber,
+        acceptedValue: acceptedValue,
       }
     ];
   };
@@ -44,17 +45,21 @@ export default class Receiver extends PaxosRole {
   }
 
   protected receiveAcceptRequest(message: AcceptStageRequest): Array<Message> {
+    let accepted = false;
     if (message.proposalNumber >= this.highestSeenProposalNumber) {
       this.highestSeenProposalNumber = message.proposalNumber;
       this.acceptedValue = message.proposedValue;
+      accepted = true;
     }
     return [
       <AcceptStageResponse>{
         kind: 'AcceptStageResponse',
         toNodeId: message.fromNodeId,
         fromNodeId: this.id,
+        proposalNumber: message.proposalNumber,
+        accepted: accepted,
         highestSeenProposalNumber: this.highestSeenProposalNumber,
-        acceptedValue: this.acceptedValue,
+        acceptedValue: accepted ? this.acceptedValue : null,
       }
     ];
   }

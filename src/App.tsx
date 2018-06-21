@@ -16,17 +16,31 @@ export interface MessageState {
   message: Message;
 }
 
+interface ProposerState {
+  isProposing: boolean;
+  proposalNumber: number;
+  proposedValue: string;
+  responses: number;
+  phase: string;
+}
+
+interface ReceiverState {
+  highestSeenProposalNumber: number;
+  acceptedValue: string | null;
+}
+
+interface LearnerState {
+  responses: number;
+  learnedValue: string | null;
+}
+
 export interface NodeState {
   // Global state
   id: number;
-  isProposing: boolean;
-  proposalNumber: number;
-  acceptedValue: string | null;
 
-  // Proposer state
-  proposedValue: string;
-  responses: number;
-  // stage: 'Prepare';
+  proposer: ProposerState;
+  receiver: ReceiverState;
+  learner: LearnerState;
 }
 
 function getNodeStates(paxos: Paxos): Array<NodeState> {
@@ -36,12 +50,24 @@ function getNodeStates(paxos: Paxos): Array<NodeState> {
     }
     return {
       id: node.getId(),
-      isProposing: node.isProposing(),
-      proposalNumber: node.getProposalNumber(),
-      acceptedValue: node.getAcceptedValue(),
 
-      proposedValue: node.getProposedValue(),
-      responses: node.getNumResponses(),
+      proposer: {
+        isProposing: node.isProposing(),
+        proposalNumber: node.getProposalNumber(),
+        proposedValue: node.getProposedValue(),
+        responses: node.getNumProposerResponses(),
+        phase: node.getProposerPhase(),
+      },
+
+      receiver: {
+        highestSeenProposalNumber: node.getHighestSeenProposalNumber(),
+        acceptedValue: node.getAcceptedValue(),
+      },
+
+      learner: {
+        responses: node.getNumLearnerResponses(),
+        learnedValue: node.getLearnedValue(),
+      },
     };
   });
 }

@@ -66,11 +66,21 @@ export default class PaxosNode {
     return prepareRequests.filter((request: PrepareStageRequest) => request.toNodeId !== this.id)
   }
 
-  // Getter methods
+  // getter methods
   getId = () => this.id;
-  getProposalNumber = () => this.receiver.getHighestSeenProposalNumber();
+
+  // proposer
   isProposing = () => this.proposer.getIsProposing();
-  getAcceptedValue = () => this.receiver.getAcceptedValue();
+  getProposalNumber = () => this.proposer.getProposalNumber();
   getProposedValue = () => this.proposer.getProposedValue();
-  getNumResponses = () => this.proposer.getNumResponses();
+  getNumProposerResponses = () => this.proposer.getNumResponses();
+  getProposerPhase = () => this.proposer.getPhase();
+
+  // receiver
+  getHighestSeenProposalNumber = () => this.receiver.getHighestSeenProposalNumber();
+  getAcceptedValue = () => this.receiver.getAcceptedValue();
+
+  // learner
+  getNumLearnerResponses = () => this.learner.getNumResponses();
+  getLearnedValue = () => this.learner.getLearnedValue();
 }

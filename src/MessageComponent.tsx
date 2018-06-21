@@ -71,8 +71,9 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
             <div className="message-text">Prepare Response</div>
             <div className="message-text">From: #{fromNodeId}</div>
             <div className="message-text">To: #{toNodeId}</div>
-            <div className="message-text">Proposal #{prepareResponse.previouslyHighestSeenProposalNumber}</div>
-            <div className="message-text">Accepted value: {prepareResponse.previouslyAcceptedValue}</div>
+            <div className="message-text">Proposal #{prepareResponse.proposalNumber}</div>
+            <div className="message-text">Highest previous proposal #{prepareResponse.highestSeenProposalNumber}</div>
+            <div className="message-text">Accepted value: {prepareResponse.acceptedValue}</div>
           </div>
         );
         break;
@@ -81,7 +82,7 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
         const acceptRequest = message as AcceptStageRequest;
         component = (
           <div className={classes} id={id}>
-            <div className="message-text">Prepare Response</div>
+            <div className="message-text">Accept Request</div>
             <div className="message-text">From: #{fromNodeId}</div>
             <div className="message-text">To: #{toNodeId}</div>
             <div className="message-text">Proposal #: #{acceptRequest.proposalNumber}</div>
@@ -94,10 +95,10 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
         const acceptResponse = message as AcceptStageResponse;
         component = (
           <div className={classes} id={id}>
-            <div className="message-text">Prepare Response</div>
+            <div className="message-text">Accept Response</div>
             <div className="message-text">From: #{fromNodeId}</div>
             <div className="message-text">To: #{toNodeId}</div>
-            <div className="message-text">Proposal #: #{acceptResponse.highestSeenProposalNumber}</div>
+            <div className="message-text">Proposal #: #{acceptResponse.proposalNumber}</div>
             <div className="message-text">Accepted Value: {acceptResponse.acceptedValue}</div>
           </div>
         );

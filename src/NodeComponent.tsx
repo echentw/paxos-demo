@@ -46,8 +46,9 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
 
   render() {
     const { connectDropTarget, isOver, nodeState } = this.props;
-    const { id, isProposing, proposalNumber, acceptedValue, proposedValue, responses } = nodeState;
-    console.log('id', id, 'isProposing', isProposing);
+
+    const { id, proposer: proposerState, receiver: receiverState, learner: learnerState } = nodeState;
+
     const classes = isOver ? 'node is-over' : 'node';
     return connectDropTarget(
       <div className={classes} onClick={this.handleClick}>
@@ -55,13 +56,16 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
           Id: {id}
         </div>
         <div className="node-proposal-number">
-          Proposal #: {proposalNumber}
+          Proposal #: {proposerState.proposalNumber}
         </div>
         <div className="node-accepted-value">
-          Accepted Value: {acceptedValue}
+          Accepted Value: {receiverState.acceptedValue}
         </div>
         <div className="node-is-proposing">
-          isProposing: {isProposing ? 'true' : 'false'}
+          isProposing: {proposerState.isProposing ? 'true' : 'false'}
+        </div>
+        <div className="node-is-proposing">
+          learnedValue: {learnerState.learnedValue}
         </div>
       </div>
     );

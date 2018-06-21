@@ -20,6 +20,7 @@ export default class Learner extends PaxosRole {
     super();
     this.id = id;
     this.proposalNumber = -1;
+    this.responses = [];
   }
 
   initializeReceiverNodeIds(receiverNodeIds: Array<number>): void {
@@ -39,12 +40,12 @@ export default class Learner extends PaxosRole {
   }
 
   protected receiveAcceptResponse(message: AcceptStageResponse): Array<Message> {
-    if (message.highestSeenProposalNumber < this.proposalNumber) {
+    if (message.proposalNumber < this.proposalNumber) {
       return [];
     }
 
-    if (message.highestSeenProposalNumber > this.proposalNumber) {
-      this.proposalNumber = message.highestSeenProposalNumber;
+    if (message.proposalNumber > this.proposalNumber) {
+      this.proposalNumber = message.proposalNumber;
       this.responses = [];
       this.learnedValue = null
     }
@@ -58,5 +59,6 @@ export default class Learner extends PaxosRole {
   }
 
   getId = () => this.id;
+  getNumResponses = () => this.responses.length;
   getLearnedValue = () => this.learnedValue;
 }
