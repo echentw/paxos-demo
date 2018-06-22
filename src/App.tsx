@@ -16,31 +16,26 @@ export interface MessageState {
   message: Message;
 }
 
-interface ProposerState {
-  isProposing: boolean;
-  proposalNumber: number;
-  proposedValue: string;
-  responses: number;
-  phase: string;
-}
-
-interface ReceiverState {
-  highestSeenProposalNumber: number;
-  acceptedValue: string | null;
-}
-
-interface LearnerState {
-  responses: number;
-  learnedValue: string | null;
-}
-
 export interface NodeState {
-  // Global state
   id: number;
 
-  proposer: ProposerState;
-  receiver: ReceiverState;
-  learner: LearnerState;
+  proposer: {
+    isProposing: boolean;
+    proposalNumber: number;
+    proposedValue: string;
+    responses: number;
+    phase: string;
+  };
+
+  receiver: {
+    highestSeenProposalNumber: number;
+    acceptedValue: string | null;
+  };
+
+  learner: {
+    responses: number;
+    learnedValue: string | null;
+  };
 }
 
 function getNodeStates(paxos: Paxos): Array<NodeState> {

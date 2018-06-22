@@ -35,6 +35,45 @@ interface NodeComponentProps {
   isOver: boolean,
 }
 
+const ProposerComponent = ({ proposerState }) => {
+  const { isProposing, proposalNumber, proposedValue, responses, phase } = proposerState;
+  return (
+    <div className="proposer-component">
+      <div className="node-text">
+        Proposal #: {proposalNumber}
+      </div>
+      <div className="node-text">
+        isProposing: {isProposing ? 'true' : 'false'}
+      </div>
+      <div className="node-text">
+        proposed value: {proposedValue}
+      </div>
+    </div>
+  );
+};
+
+const ReceiverComponent = ({ receiverState }) => {
+  const { highestSeenProposalNumber, acceptedValue } = receiverState;
+  return (
+    <div className="receiver-component">
+      <div className="node-text">
+        Accepted Value: {receiverState.acceptedValue}
+      </div>
+    </div>
+  );
+};
+
+const LearnerComponent = ({ learnerState }) => {
+  const { responses, learnedValue } = learnerState;
+  return (
+    <div className="learner-component">
+      <div className="node-text">
+        learnedValue: {learnerState.learnedValue}
+      </div>
+    </div>
+  );
+};
+
 class NodeComponent extends React.Component<NodeComponentProps, {}> {
   constructor(props: NodeComponentProps) {
     super(props);
@@ -52,21 +91,12 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
     const classes = isOver ? 'node is-over' : 'node';
     return connectDropTarget(
       <div className={classes} onClick={this.handleClick}>
-        <div className="node-id">
+        <div className="node-text">
           Id: {id}
         </div>
-        <div className="node-proposal-number">
-          Proposal #: {proposerState.proposalNumber}
-        </div>
-        <div className="node-accepted-value">
-          Accepted Value: {receiverState.acceptedValue}
-        </div>
-        <div className="node-is-proposing">
-          isProposing: {proposerState.isProposing ? 'true' : 'false'}
-        </div>
-        <div className="node-is-proposing">
-          learnedValue: {learnerState.learnedValue}
-        </div>
+        <ProposerComponent proposerState={proposerState}/>
+        <ReceiverComponent receiverState={receiverState}/>
+        <LearnerComponent learnerState={learnerState}/>
       </div>
     );
   }
