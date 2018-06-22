@@ -15,7 +15,7 @@ const messageDragSource = {
   beginDrag(props) {
     return {
       messageId: props.messageState.id,
-      toNodeId: props.messageState.message.toNodeId,
+      toNodeId: props.messageState.message.headers.toNodeId,
     };
   },
 

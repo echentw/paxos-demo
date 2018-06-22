@@ -16,7 +16,7 @@ const nodeDropTarget = {
   canDrop(props, monitor) {
     const { id } = props.nodeState;
     const { toNodeId } = monitor.getItem();
-    return toNodeId == id;
+    return toNodeId === id;
   }
 }
 
