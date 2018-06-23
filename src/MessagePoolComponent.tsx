@@ -3,7 +3,7 @@ import * as React from 'react';
 import MessagePool, { IdMessagePair } from './lib/message_pool';
 import Paxos from './lib/paxos';
 
-import { MessageState } from './App';
+import { MessageState } from './AppState';
 
 import MessageComponent from './MessageComponent';
 

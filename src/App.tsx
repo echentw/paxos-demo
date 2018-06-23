@@ -8,35 +8,10 @@ import PaxosNode from './lib/paxos_node';
 import MessagePool from './lib/message_pool';
 import Paxos from './lib/paxos';
 
+import { NodeState, MessageState } from './AppState';
 import MessagePoolComponent from './MessagePoolComponent';
 import NodeClusterComponent from './NodeClusterComponent';
 
-export interface MessageState {
-  id: string;
-  message: Message;
-}
-
-export interface NodeState {
-  id: number;
-
-  proposer: {
-    isProposing: boolean;
-    proposalNumber: number;
-    proposedValue: string;
-    responses: number;
-    phase: string;
-  };
-
-  receiver: {
-    highestSeenProposalNumber: number;
-    acceptedValue: string | null;
-  };
-
-  learner: {
-    responses: number;
-    learnedValue: string | null;
-  };
-}
 
 function getNodeStates(paxos: Paxos): Array<NodeState> {
   return paxos.nodes.map((node, index) => {

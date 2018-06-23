@@ -4,7 +4,7 @@ import { Message } from './lib/message_types';
 import PaxosNode from './lib/paxos_node';
 import Paxos from './lib/paxos';
 
-import { NodeState } from './App';
+import { NodeState } from './AppState';
 
 import NodeComponent from './NodeComponent';
 

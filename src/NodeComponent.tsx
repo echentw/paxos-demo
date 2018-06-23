@@ -5,7 +5,7 @@ import { Message } from './lib/message_types';
 import PaxosNode from './lib/paxos_node';
 import Paxos from './lib/paxos';
 
-import { NodeState } from './App';
+import { NodeState, ProposerState, ReceiverState, LearnerState } from './AppState';
 
 
 const nodeDropTarget = {
@@ -35,40 +35,63 @@ interface NodeComponentProps {
   isOver: boolean,
 }
 
-const ProposerComponent = ({ proposerState }) => {
+const ProposerComponent = ({ proposerState }: { proposerState: ProposerState }) => {
   const { isProposing, proposalNumber, proposedValue, responses, phase } = proposerState;
-  return (
-    <div className="proposer-component">
-      <div className="node-text">
-        Proposal #: {proposalNumber}
+  if (isProposing) {
+    return (
+      <div className="proposer-component">
+        <div className="node-text">Proposer State</div>
+        <div className="node-text">
+          - proposal #: {proposalNumber}
+        </div>
+        <div className="node-text">
+          - proposed value: {proposedValue}
+        </div>
+        <div className="node-text">
+          - responses: {responses}
+        </div>
+        <div className="node-text">
+          - phase: {phase}
+        </div>
       </div>
-      <div className="node-text">
-        isProposing: {isProposing ? 'true' : 'false'}
+    );
+  } else {
+    return (
+      <div className="proposer-component">
+        <div className="node-text">Proposer State</div>
+        <div className="node-text">
+          - not proposing
+        </div>
       </div>
-      <div className="node-text">
-        proposed value: {proposedValue}
-      </div>
-    </div>
-  );
+    );
+  }
 };
 
-const ReceiverComponent = ({ receiverState }) => {
+const ReceiverComponent = ({ receiverState }: { receiverState: ReceiverState }) => {
   const { highestSeenProposalNumber, acceptedValue } = receiverState;
   return (
     <div className="receiver-component">
+      <div className="node-text">Receiver State</div>
       <div className="node-text">
-        Accepted Value: {receiverState.acceptedValue}
+        - highest-seen proposal #: {receiverState.highestSeenProposalNumber}
+      </div>
+      <div className="node-text">
+        - accepted Value: {receiverState.acceptedValue}
       </div>
     </div>
   );
 };
 
-const LearnerComponent = ({ learnerState }) => {
+const LearnerComponent = ({ learnerState }: { learnerState: LearnerState }) => {
   const { responses, learnedValue } = learnerState;
   return (
     <div className="learner-component">
+      <div className="node-text">Learner State</div>
       <div className="node-text">
-        learnedValue: {learnerState.learnedValue}
+        - responses: {learnerState.responses}
+      </div>
+      <div className="node-text">
+        - learned value: {learnerState.learnedValue}
       </div>
     </div>
   );
@@ -86,17 +109,17 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
   render() {
     const { connectDropTarget, isOver, nodeState } = this.props;
 
-    const { id, proposer: proposerState, receiver: receiverState, learner: learnerState } = nodeState;
+    const { id, proposer, receiver, learner } = nodeState;
 
     const classes = isOver ? 'node is-over' : 'node';
     return connectDropTarget(
       <div className={classes} onClick={this.handleClick}>
         <div className="node-text">
-          Id: {id}
+          Node #{id}
         </div>
-        <ProposerComponent proposerState={proposerState}/>
-        <ReceiverComponent receiverState={receiverState}/>
-        <LearnerComponent learnerState={learnerState}/>
+        <ProposerComponent proposerState={proposer}/>
+        <ReceiverComponent receiverState={receiver}/>
+        <LearnerComponent learnerState={learner}/>
       </div>
     );
   }

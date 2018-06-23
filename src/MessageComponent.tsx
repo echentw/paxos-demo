@@ -9,7 +9,7 @@ import {
   AcceptResponse,
 } from './lib/message_types';
 
-import { MessageState } from './App';
+import { MessageState } from './AppState';
 
 const messageDragSource = {
   beginDrag(props) {
