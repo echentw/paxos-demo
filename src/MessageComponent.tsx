@@ -40,6 +40,17 @@ interface MessageComponentProps {
   isDragging: boolean,
 }
 
+const MessageHeadersComponent = ({ name, message }: { name: string, message: Message }) => {
+  const { proposalNumber, fromNodeId, toNodeId } = message.headers;
+  return (
+    <div className="message-header-component">
+      <div className="message-text">{name}</div>
+      <div className="message-text">proposal #{proposalNumber}</div>
+      <div className="message-text">Node #{fromNodeId} &rarr; Node #{toNodeId}</div>
+    </div>
+  );
+};
+
 class MessageComponent extends React.Component<MessageComponentProps, {}> {
   constructor(props: MessageComponentProps) {
     super(props);
@@ -56,52 +67,53 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
       case 'PrepareRequest': {
         component = (
           <div className={classes} id={id}>
-            <div className="message-text">Prepare Request</div>
-            <div className="message-text">From: #{fromNodeId}</div>
-            <div className="message-text">To: #{toNodeId}</div>
-            <div className="message-text">Proposal #{proposalNumber}</div>
+            <MessageHeadersComponent name="Prepare Request" message={message}/>
           </div>
         );
         break;
       }
       case 'PrepareResponse': {
         const response = message as PrepareResponse;
+        const { highestSeenProposalNumber, acceptedValue } = response.body;
         component = (
           <div className={classes} id={id}>
-            <div className="message-text">Prepare Response</div>
-            <div className="message-text">From: #{fromNodeId}</div>
-            <div className="message-text">To: #{toNodeId}</div>
-            <div className="message-text">Proposal #{proposalNumber}</div>
-            <div className="message-text">Highest previous proposal #{response.body.highestSeenProposalNumber}</div>
-            <div className="message-text">Accepted value: {response.body.acceptedValue}</div>
+            <MessageHeadersComponent name="Prepare Response" message={message}/>
+            <div className="message-text">highest previous proposal #{highestSeenProposalNumber}</div>
+            <div className="message-text">accepted value: {acceptedValue}</div>
           </div>
         );
         break;
       }
       case 'AcceptRequest': {
         const request = message as AcceptRequest;
+        const { proposedValue } = request.body;
         component = (
           <div className={classes} id={id}>
-            <div className="message-text">Accept Request</div>
-            <div className="message-text">From: #{fromNodeId}</div>
-            <div className="message-text">To: #{toNodeId}</div>
-            <div className="message-text">Proposal #: #{proposalNumber}</div>
-            <div className="message-text">Proposed Value: {request.body.proposedValue}</div>
+            <MessageHeadersComponent name="Accept Request" message={message}/>
+            <div className="message-text">proposed Value: {proposedValue}</div>
           </div>
         );
         break;
       }
       case 'AcceptResponse': {
         const response = message as AcceptResponse;
-        component = (
-          <div className={classes} id={id}>
-            <div className="message-text">Accept Response</div>
-            <div className="message-text">From: #{fromNodeId}</div>
-            <div className="message-text">To: #{toNodeId}</div>
-            <div className="message-text">Proposal #: #{proposalNumber}</div>
-            <div className="message-text">Accepted Value: {response.body.acceptedValue}</div>
-          </div>
-        );
+        const { accepted, highestSeenProposalNumber } = response.body;
+        if (accepted) {
+          component = (
+            <div className={classes} id={id}>
+              <MessageHeadersComponent name="Accept Response" message={message}/>
+              <div className="message-text">ACCEPTED</div>
+            </div>
+          );
+        } else {
+          component = (
+            <div className={classes} id={id}>
+              <MessageHeadersComponent name="Accept Response" message={message}/>
+              <div className="message-text">REJECTED</div>
+              <div className="message-text">highest seen proposal #: {highestSeenProposalNumber}</div>
+            </div>
+          );
+        }
         break;
       }
     }
