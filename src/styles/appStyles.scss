@@ -1,0 +1,66 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+  margin: auto;
+  background-color: black;
+
+  .nodes-container {
+    flex: 3;
+
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+
+    padding: 10px;
+    background-color: cyan;
+
+    .node-component {
+      margin: 10px;
+      height: 150px;
+      width: 400px;
+
+      border-radius: 50% / 50%;
+      -moz-border-radius: 50% / 50%;
+      -webkit-border-radius: 50% / 50%;
+
+      background-color: lightgrey;
+
+      border-width: 4px;
+      border-color: lightgrey;
+      border-style: solid;
+
+      &.is-over {
+        border-color: black;
+      }
+    }
+  }
+
+  .message-pool-container {
+    flex: 2;
+
+    display: flex;
+    -webkit-flex-flow: row wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+
+    padding: 10px;
+    background-color: lightblue;
+
+    .message {
+      margin: 10px;
+      height: 100px;
+      width: 100px;
+      background-color: tomato;
+
+      &.is-dragging {
+        opacity: 0.0;
+      }
+
+      .message-text {
+        font-size: 12px;
+      }
+    }
+  }
+}

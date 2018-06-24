@@ -12,6 +12,7 @@ import { NodeState, MessageState } from './AppState';
 import MessagePoolComponent from './MessagePoolComponent';
 import NodeClusterComponent from './NodeClusterComponent';
 
+import './styles/appStyles.scss';
 
 function getNodeStates(paxos: Paxos): Array<NodeState> {
   return paxos.nodes.map((node, index) => {

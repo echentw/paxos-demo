@@ -111,7 +111,7 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
 
     const { id, proposer, receiver, learner } = nodeState;
 
-    const classes = isOver ? 'node is-over' : 'node';
+    const classes = isOver ? 'node-component is-over' : 'node-component';
     return connectDropTarget(
       <div className={classes} onClick={this.handleClick}>
         <div className="node-text">
