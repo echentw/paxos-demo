@@ -1,7 +1,12 @@
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
 .container {
   display: flex;
   flex-direction: row;
-  padding: 10px;
   margin: auto;
   background-color: black;
 
@@ -17,7 +22,11 @@
     background-color: cyan;
 
     .node-component {
-      margin: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      margin: 4px;
       height: 150px;
       width: 400px;
 
@@ -33,6 +42,49 @@
 
       &.is-over {
         border-color: black;
+      }
+
+      .node-label {
+        margin-bottom: 4px;
+      }
+
+      .roles-container {
+        display: flex;
+        flex-direction: row;
+        background-color: white;
+
+        height: 96px;
+        width: 280px;
+
+        $role-padding: 4px;
+        $role-margin: 1px;
+
+        .proposer-component {
+          flex: 1;
+          padding: $role-padding;
+          background-color: pink;
+          margin: $role-margin;
+        }
+
+        .receiver-learner-container {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+
+          .receiver-component {
+            flex: 1;
+            padding: $role-padding;
+            background-color: lightgreen;
+            margin: $role-margin;
+          }
+
+          .learner-component {
+            flex: 1;
+            padding: $role-padding;
+            background-color: yellow;
+            margin: $role-margin;
+          }
+        }
       }
     }
   }

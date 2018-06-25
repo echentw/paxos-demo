@@ -40,27 +40,25 @@ const ProposerComponent = ({ proposerState }: { proposerState: ProposerState }) 
   if (isProposing) {
     return (
       <div className="proposer-component">
-        <div className="node-text">Proposer State</div>
         <div className="node-text">
-          - proposal #: {proposalNumber}
+          PN #{proposalNumber}
         </div>
         <div className="node-text">
-          - proposed value: {proposedValue}
+          PV: {proposedValue}
         </div>
         <div className="node-text">
-          - responses: {responses}
+          responses: {responses}
         </div>
         <div className="node-text">
-          - phase: {phase}
+          phase: {phase}
         </div>
       </div>
     );
   } else {
     return (
       <div className="proposer-component">
-        <div className="node-text">Proposer State</div>
         <div className="node-text">
-          - not proposing
+          not proposing
         </div>
       </div>
     );
@@ -71,12 +69,11 @@ const ReceiverComponent = ({ receiverState }: { receiverState: ReceiverState }) 
   const { highestSeenProposalNumber, acceptedValue } = receiverState;
   return (
     <div className="receiver-component">
-      <div className="node-text">Receiver State</div>
       <div className="node-text">
-        - highest-seen proposal #: {receiverState.highestSeenProposalNumber}
+        promised PN #{receiverState.highestSeenProposalNumber}
       </div>
       <div className="node-text">
-        - accepted Value: {receiverState.acceptedValue}
+        accepted: {receiverState.acceptedValue}
       </div>
     </div>
   );
@@ -86,12 +83,11 @@ const LearnerComponent = ({ learnerState }: { learnerState: LearnerState }) => {
   const { responses, learnedValue } = learnerState;
   return (
     <div className="learner-component">
-      <div className="node-text">Learner State</div>
       <div className="node-text">
-        - responses: {learnerState.responses}
+        responses: {learnerState.responses}
       </div>
       <div className="node-text">
-        - learned value: {learnerState.learnedValue}
+        learned value: {learnerState.learnedValue}
       </div>
     </div>
   );
@@ -114,12 +110,16 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
     const classes = isOver ? 'node-component is-over' : 'node-component';
     return connectDropTarget(
       <div className={classes} onClick={this.handleClick}>
-        <div className="node-text">
+        <div className="node-label">
           Node #{id}
         </div>
-        <ProposerComponent proposerState={proposer}/>
-        <ReceiverComponent receiverState={receiver}/>
-        <LearnerComponent learnerState={learner}/>
+        <div className="roles-container">
+          <ProposerComponent proposerState={proposer}/>
+          <div className="receiver-learner-container">
+            <ReceiverComponent receiverState={receiver}/>
+            <LearnerComponent learnerState={learner}/>
+          </div>
+        </div>
       </div>
     );
   }
