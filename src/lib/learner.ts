@@ -53,6 +53,10 @@ export default class Learner extends PaxosRole {
       this.learnedValue = null
     }
 
+    if (body.highestSeenProposalNumber > this.proposalNumber) {
+      return [];
+    }
+
     this.responses.push(message);
     if (this.responses.length > this.receiverNodeIds.length / 2) {
       this.learnedValue = this.responses[0].body.acceptedValue;

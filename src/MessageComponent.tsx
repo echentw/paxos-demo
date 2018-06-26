@@ -45,8 +45,8 @@ const MessageHeadersComponent = ({ name, message }: { name: string, message: Mes
   return (
     <div className="message-header-component">
       <div className="message-text">{name}</div>
-      <div className="message-text">proposal #{proposalNumber}</div>
-      <div className="message-text">Node #{fromNodeId} &rarr; Node #{toNodeId}</div>
+      <div className="message-text">PN {proposalNumber}</div>
+      <div className="message-text">from node #{fromNodeId}</div>
     </div>
   );
 };
@@ -61,7 +61,7 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
     const { id, message } = messageState;
     const { toNodeId, fromNodeId, proposalNumber } = message.headers;
 
-    const classes = isDragging ? 'message is-dragging' : 'message';
+    const classes = isDragging ? 'message-container is-dragging' : 'message-container';
     let component;
     switch(message.kind) {
       case 'PrepareRequest': {
@@ -78,7 +78,7 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
         component = (
           <div className={classes} id={id}>
             <MessageHeadersComponent name="Prepare Response" message={message}/>
-            <div className="message-text">highest previous proposal #{highestSeenProposalNumber}</div>
+            <div className="message-text">prev promised PN: {highestSeenProposalNumber}</div>
             <div className="message-text">accepted value: {acceptedValue}</div>
           </div>
         );
@@ -90,7 +90,7 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
         component = (
           <div className={classes} id={id}>
             <MessageHeadersComponent name="Accept Request" message={message}/>
-            <div className="message-text">proposed Value: {proposedValue}</div>
+            <div className="message-text">PV: {proposedValue}</div>
           </div>
         );
         break;
