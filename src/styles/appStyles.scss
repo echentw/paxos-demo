@@ -11,12 +11,11 @@
   background-color: black;
 
   .nodes-container {
-    flex: 3;
+    width: 500px;
 
     display: flex;
-    -webkit-flex-flow: row wrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+    flex-direction: column;
+    align-items: center;
 
     padding: 10px;
     background-color: cyan;
@@ -90,7 +89,7 @@
   }
 
   .message-pool-container {
-    flex: 2;
+    flex: 1;
 
     display: flex;
     -webkit-flex-flow: row wrap;
