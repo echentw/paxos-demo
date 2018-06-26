@@ -28,4 +28,5 @@ export interface NodeState {
   proposer: ProposerState;
   receiver: ReceiverState;
   learner: LearnerState;
+  messages: Array<MessageState>;
 }

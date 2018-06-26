@@ -4,113 +4,127 @@
   box-sizing: border-box;
 }
 
-.container {
+.app-container {
   display: flex;
-  flex-direction: row;
-  margin: auto;
+  flex-direction: column;
   background-color: black;
 
-  .nodes-container {
-    width: 500px;
+  border: 2px solid black;
 
+  .node-messages-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
 
-    padding: 10px;
-    background-color: cyan;
+    height: 160px;
 
-    .node-component {
+    .node-container {
       display: flex;
       flex-direction: column;
       align-items: center;
 
-      margin: 4px;
-      height: 150px;
-      width: 400px;
+      background-color: lightblue;
 
-      border-radius: 50% / 50%;
-      -moz-border-radius: 50% / 50%;
-      -webkit-border-radius: 50% / 50%;
-
-      background-color: lightgrey;
-
-      border-width: 4px;
-      border-color: lightgrey;
-      border-style: solid;
-
-      &.is-over {
-        border-color: black;
-      }
-
-      .node-label {
-        margin-bottom: 4px;
-      }
-
-      .roles-container {
+      .node-component {
         display: flex;
-        flex-direction: row;
-        background-color: white;
+        flex-direction: column;
+        align-items: center;
 
-        height: 96px;
-        width: 280px;
+        margin: 4px;
+        height: 150px;
+        width: 400px;
 
-        $role-padding: 4px;
-        $role-margin: 1px;
+        border-radius: 50% / 50%;
+        -moz-border-radius: 50% / 50%;
+        -webkit-border-radius: 50% / 50%;
 
-        .proposer-component {
-          flex: 1;
-          padding: $role-padding;
-          background-color: pink;
-          margin: $role-margin;
+        background-color: lightgrey;
+
+        border: 4px solid lightgrey;
+
+        &.is-over {
+          border-color: black;
         }
 
-        .receiver-learner-container {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
+        .node-label {
+          margin-bottom: 4px;
+        }
 
-          .receiver-component {
+        .roles-container {
+          display: flex;
+          flex-direction: row;
+          background-color: white;
+
+          height: 96px;
+          width: 280px;
+
+          $role-padding: 4px;
+          $role-margin: 1px;
+
+          .proposer-component {
             flex: 1;
             padding: $role-padding;
-            background-color: lightgreen;
+            background-color: pink;
             margin: $role-margin;
           }
 
-          .learner-component {
+          .receiver-learner-container {
             flex: 1;
-            padding: $role-padding;
-            background-color: yellow;
-            margin: $role-margin;
+            display: flex;
+            flex-direction: column;
+
+            .receiver-component {
+              flex: 1;
+              padding: $role-padding;
+              background-color: lightgreen;
+              margin: $role-margin;
+            }
+
+            .learner-component {
+              flex: 1;
+              padding: $role-padding;
+              background-color: yellow;
+              margin: $role-margin;
+            }
           }
         }
       }
     }
-  }
 
-  .message-pool-container {
-    flex: 1;
+    .messages-outer-container {
+      flex: 1;
 
-    display: flex;
-    -webkit-flex-flow: row wrap;
-    justify-content: flex-start;
-    align-content: flex-start;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
 
-    padding: 10px;
-    background-color: lightblue;
+      background-color: lightgreen;
 
-    .message {
-      margin: 10px;
-      height: 100px;
-      width: 100px;
-      background-color: tomato;
+      border: 1px solid black;
 
-      &.is-dragging {
-        opacity: 0.0;
+      .messages-label {
+        margin-left: 10px;
       }
 
-      .message-text {
-        font-size: 12px;
+      .messages-inner-container {
+        flex: 1;
+
+        display: flex;
+        flex-direction: row;
+
+        .message {
+          margin: 10px;
+          height: 100px;
+          width: 120px;
+          background-color: tomato;
+
+          &.is-dragging {
+            opacity: 0.0;
+          }
+
+          .message-text {
+            font-size: 12px;
+          }
+        }
       }
     }
   }

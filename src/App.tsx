@@ -8,9 +8,8 @@ import PaxosNode from './lib/paxos_node';
 import MessagePool from './lib/message_pool';
 import Paxos from './lib/paxos';
 
-import { NodeState, MessageState } from './AppState';
-import MessagePoolComponent from './MessagePoolComponent';
-import NodeClusterComponent from './NodeClusterComponent';
+import { NodeState } from './AppState';
+import NodeMessagesComponent from './NodeMessagesComponent';
 
 import './styles/appStyles.scss';
 
@@ -39,16 +38,8 @@ function getNodeStates(paxos: Paxos): Array<NodeState> {
         responses: node.getNumLearnerResponses(),
         learnedValue: node.getLearnedValue(),
       },
-    };
-  });
-}
 
-function getMessageStates(paxos: Paxos): Array<MessageState> {
-  return paxos.messagePool.idMessagePairs.map((pair) => {
-    const { id, message } = pair;
-    return {
-      id: id,
-      message: message,
+      messages: paxos.messagePool.getIdMessagePairsToNodeId(node.getId()),
     };
   });
 }
@@ -60,7 +51,6 @@ class App extends React.Component<any, any> {
     this.state = {
       paxos: paxos,
       nodeStates: getNodeStates(paxos),
-      messageStates: getMessageStates(paxos),
     };
   }
 
@@ -73,7 +63,6 @@ class App extends React.Component<any, any> {
 
     this.setState({
       nodeStates: getNodeStates(paxos),
-      messageStates: getMessageStates(paxos),
     });
   }
 
@@ -87,23 +76,21 @@ class App extends React.Component<any, any> {
 
     this.setState({
       nodeStates: getNodeStates(paxos),
-      messageStates: getMessageStates(paxos),
     });
   }
 
   render() {
+    const nodeMessagesComponents = this.state.nodeStates.map((nodeState) =>
+      <NodeMessagesComponent
+        paxos={this.state.paxos}
+        nodeState={nodeState}
+        initiatePaxos={this.initiatePaxos}
+        deliverMessage={this.deliverMessage}
+      />
+    );
     return (
-      <div className="container">
-        <NodeClusterComponent
-          paxos={this.state.paxos}
-          initiatePaxos={this.initiatePaxos}
-          nodeStates={this.state.nodeStates}
-        />
-        <MessagePoolComponent
-          paxos={this.state.paxos}
-          deliverMessage={this.deliverMessage}
-          messageStates={this.state.messageStates}
-        />
+      <div className="app-container">
+        {nodeMessagesComponents}
       </div>
     );
   }

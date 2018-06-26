@@ -61,4 +61,8 @@ export default class MessagePool {
   clear(): void {
     this.idMessagePairs = [];
   }
+
+  getIdMessagePairsToNodeId(nodeId: number): Array<IdMessagePair> {
+    return this.idMessagePairs.filter((pair) => pair.message.headers.toNodeId === nodeId);
+  }
 }
