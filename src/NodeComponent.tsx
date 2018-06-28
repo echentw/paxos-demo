@@ -109,7 +109,7 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
 
     const classes = isOver ? 'node-component is-over' : 'node-component';
     return connectDropTarget(
-      <div className={classes} onClick={this.handleClick}>
+      <div className={classes}>
         <div className="node-label">
           Node #{id}
         </div>
@@ -120,6 +120,9 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
             <LearnerComponent learnerState={learner}/>
           </div>
         </div>
+        <button className="button" onClick={this.handleClick}>
+          Initiate Paxos
+        </button>
       </div>
     );
   }

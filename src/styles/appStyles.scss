@@ -4,6 +4,36 @@
   box-sizing: border-box;
 }
 
+@mixin button-colors($color, $hover-color, $active-color) {
+  background-color: $color;
+  &:hover {
+    background-color: $hover-color;
+  }
+  &:active {
+    background-color: $active-color;
+  }
+}
+
+%button-base {
+  border: none;
+  color: white;
+  text-align: center;
+
+  &:focus {
+    outline: 0;
+  }
+}
+
+.button {
+  @extend %button-base;
+  @include button-colors(
+    rgb(0, 200, 0),
+    rgb(0, 150, 0),
+    rgb(0, 100, 0)
+  );
+  font-size: 14px;
+}
+
 .app-container {
   display: flex;
   flex-direction: column;
@@ -56,6 +86,8 @@
 
           height: 96px;
           width: 280px;
+
+          margin-bottom: 4px;
 
           $role-padding: 4px;
           $role-margin: 1px;
@@ -112,14 +144,48 @@
         flex-direction: row;
 
         .message-container {
+          display: flex;
+          flex-direction: column;
+
           margin: 10px;
           padding: 4px;
-          height: 100px;
+          height: 110px;
           width: 140px;
           background-color: tomato;
 
           &.is-dragging {
             opacity: 0.0;
+          }
+
+          .message-text-container {
+            flex: 1;
+          }
+
+          .message-buttons-container {
+            display: flex;
+            flex-direction: row;
+
+            .message-deliver-button {
+              flex: 1;
+              @extend %button-base;
+              @include button-colors(
+                rgb(0, 0, 255),
+                rgb(0, 0, 200),
+                rgb(0, 0, 150)
+              );
+              font-size: 12px;
+            }
+
+            .message-drop-button {
+              flex: 1;
+              @extend %button-base;
+              @include button-colors(
+                rgb(255, 0, 0),
+                rgb(200, 0, 0),
+                rgb(150, 0, 0)
+              );
+              font-size: 12px;
+            }
           }
 
           .message-text {

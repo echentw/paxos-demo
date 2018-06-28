@@ -51,13 +51,32 @@ const MessageHeadersComponent = ({ name, message }: { name: string, message: Mes
   );
 };
 
+interface ButtonsComponentProps {
+  deliver: () => void;
+  drop: () => void;
+}
+
+const ButtonsComponent = (props: ButtonsComponentProps) => {
+  const { deliver, drop } = props;
+  return (
+    <div className="message-buttons-container">
+      <button className="message-deliver-button" onClick={deliver}>
+        Deliver
+      </button>
+      <button className="message-drop-button" onClick={drop}>
+        Drop
+      </button>
+    </div>
+  );
+};
+
 class MessageComponent extends React.Component<MessageComponentProps, {}> {
   constructor(props: MessageComponentProps) {
     super(props);
   }
 
   render() {
-    const { connectDragSource, isDragging, messageState } = this.props;
+    const { connectDragSource, isDragging, messageState, deliverMessage } = this.props;
     const { id, message } = messageState;
     const { toNodeId, fromNodeId, proposalNumber } = message.headers;
 
@@ -67,7 +86,13 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
       case 'PrepareRequest': {
         component = (
           <div className={classes} id={id}>
-            <MessageHeadersComponent name="Prepare Request" message={message}/>
+            <div className="message-text-container">
+              <MessageHeadersComponent name="Prepare Request" message={message}/>
+            </div>
+            <ButtonsComponent
+              deliver={() => deliverMessage(id)}
+              drop={() => console.log('drop has not been implemented yet!')}
+            />
           </div>
         );
         break;
@@ -77,9 +102,11 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
         const { highestSeenProposalNumber, acceptedValue } = response.body;
         component = (
           <div className={classes} id={id}>
-            <MessageHeadersComponent name="Prepare Response" message={message}/>
-            <div className="message-text">prev promised PN: {highestSeenProposalNumber}</div>
-            <div className="message-text">accepted value: {acceptedValue}</div>
+            <div className="message-text-container">
+              <MessageHeadersComponent name="Prepare Response" message={message}/>
+              <div className="message-text">prev promised PN: {highestSeenProposalNumber}</div>
+              <div className="message-text">accepted value: {acceptedValue}</div>
+            </div>
           </div>
         );
         break;
