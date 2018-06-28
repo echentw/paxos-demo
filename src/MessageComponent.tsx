@@ -78,72 +78,65 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
   render() {
     const { connectDragSource, isDragging, messageState, deliverMessage } = this.props;
     const { id, message } = messageState;
-    const { toNodeId, fromNodeId, proposalNumber } = message.headers;
 
     const classes = isDragging ? 'message-container is-dragging' : 'message-container';
-    let component;
+
+    let name;
+    let bodyTexts;
     switch(message.kind) {
       case 'PrepareRequest': {
-        component = (
-          <div className={classes} id={id}>
-            <div className="message-text-container">
-              <MessageHeadersComponent name="Prepare Request" message={message}/>
-            </div>
-            <ButtonsComponent
-              deliver={() => deliverMessage(id)}
-              drop={() => console.log('drop has not been implemented yet!')}
-            />
-          </div>
-        );
+        name = 'Prepare Request';
+        bodyTexts = [];
         break;
       }
       case 'PrepareResponse': {
         const response = message as PrepareResponse;
         const { highestSeenProposalNumber, acceptedValue } = response.body;
-        component = (
-          <div className={classes} id={id}>
-            <div className="message-text-container">
-              <MessageHeadersComponent name="Prepare Response" message={message}/>
-              <div className="message-text">prev promised PN: {highestSeenProposalNumber}</div>
-              <div className="message-text">accepted value: {acceptedValue}</div>
-            </div>
-          </div>
-        );
+        name = 'Prepare Response';
+        bodyTexts = [
+          `prev promised PN: ${highestSeenProposalNumber}`,
+          `accepted value: ${acceptedValue}`,
+        ];
         break;
       }
       case 'AcceptRequest': {
         const request = message as AcceptRequest;
         const { proposedValue } = request.body;
-        component = (
-          <div className={classes} id={id}>
-            <MessageHeadersComponent name="Accept Request" message={message}/>
-            <div className="message-text">PV: {proposedValue}</div>
-          </div>
-        );
+        name = 'Accepted Request';
+        bodyTexts = [`PV: ${proposedValue}`];
         break;
       }
       case 'AcceptResponse': {
         const response = message as AcceptResponse;
         const { accepted, highestSeenProposalNumber } = response.body;
+        name = 'Accept Response';
         if (accepted) {
-          component = (
-            <div className={classes} id={id}>
-              <MessageHeadersComponent name="Accept Response" message={message}/>
-              <div className="message-text">ACCEPTED</div>
-            </div>
-          );
+          bodyTexts = ['ACCEPTED'];
         } else {
-          component = (
-            <div className={classes} id={id}>
-              <MessageHeadersComponent name="Accept Response" message={message}/>
-              <div className="message-text">REJECTED</div>
-              <div className="message-text">highest seen proposal #: {highestSeenProposalNumber}</div>
-            </div>
-          );
+          bodyTexts = [
+            'REJECTED',
+            `highest seen PN: ${highestSeenProposalNumber}`,
+          ];
         }
         break;
       }
     }
+
+    const bodyTextComponents = bodyTexts.map((text) => <div className="message-text">{text}</div>);
+
+    const component = (
+      <div className={classes} id={id}>
+        <div className="message-text-container">
+          <MessageHeadersComponent name={name} message={message}/>
+          {bodyTextComponents}
+        </div>
+        <ButtonsComponent
+          deliver={() => deliverMessage(id)}
+          drop={() => console.log('drop has not been implemented yet!')}
+        />
+      </div>
+    );
+
     return connectDragSource(component);
   }
 }
