@@ -10,6 +10,7 @@ interface ComponentProps {
   nodeId: number;
   messageStates: Array<MessageState>;
   deliverMessage: (messageId: string) => void;
+  dropMessage: (messageId: string) => void;
 }
 
 export default class MessagesComponent extends React.Component<ComponentProps, {}> {
@@ -23,6 +24,7 @@ export default class MessagesComponent extends React.Component<ComponentProps, {
       <MessageComponent
         messageState={messageState}
         deliverMessage={this.props.deliverMessage}
+        dropMessage={this.props.dropMessage}
       />
     );
     return (

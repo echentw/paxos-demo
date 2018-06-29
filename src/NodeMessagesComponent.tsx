@@ -12,6 +12,7 @@ interface ComponentProps {
   nodeState: NodeState;
   initiatePaxos: (nodeId: number, proposedValue: string) => void;
   deliverMessage: (messageId: string) => void;
+  dropMessage: (messageId: string) => void;
 }
 
 export default class NodeMessagesComponent extends React.Component<ComponentProps, {}> {
@@ -34,6 +35,7 @@ export default class NodeMessagesComponent extends React.Component<ComponentProp
           nodeId={nodeState.id}
           messageStates={nodeState.messages}
           deliverMessage={this.props.deliverMessage}
+          dropMessage={this.props.dropMessage}
           paxos={this.props.paxos}
         />
       </div>

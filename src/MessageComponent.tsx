@@ -12,7 +12,8 @@ import { MessageState } from './AppState';
 
 interface MessageComponentProps {
   messageState: MessageState,
-  deliverMessage: (messageId: String) => void;
+  deliverMessage: (messageId: string) => void;
+  dropMessage: (messageId: string) => void;
 }
 
 const MessageHeadersComponent = ({ name, message }: { name: string, message: Message }) => {
@@ -50,10 +51,7 @@ export default class MessageComponent extends React.Component<MessageComponentPr
     super(props);
   }
 
-  render() {
-    const { messageState, deliverMessage } = this.props;
-    const { id, message } = messageState;
-
+  extractNameAndBodyTexts = (message: Message) => {
     let name;
     let bodyTexts;
     switch(message.kind) {
@@ -94,6 +92,27 @@ export default class MessageComponent extends React.Component<MessageComponentPr
         break;
       }
     }
+    return {
+      name: name,
+      bodyTexts: bodyTexts,
+    };
+  }
+
+  deliverMessage = () => {
+    const { id } = this.props.messageState;
+    this.props.deliverMessage(id);
+  }
+
+  dropMessage = () => {
+    const { id } = this.props.messageState;
+    this.props.dropMessage(id);
+  }
+
+  render() {
+    const { messageState, deliverMessage, dropMessage } = this.props;
+    const { id, message } = messageState;
+
+    const { name, bodyTexts } = this.extractNameAndBodyTexts(message);
 
     const bodyTextComponents = bodyTexts.map((text) => <div className="message-text">{text}</div>);
 
@@ -104,8 +123,8 @@ export default class MessageComponent extends React.Component<MessageComponentPr
           {bodyTextComponents}
         </div>
         <ButtonsComponent
-          deliver={() => deliverMessage(id)}
-          drop={() => console.log('drop has not been implemented yet!')}
+          deliver={this.deliverMessage}
+          drop={this.dropMessage}
         />
       </div>
     );

@@ -76,6 +76,14 @@ export default class App extends React.Component<any, any> {
     });
   }
 
+  dropMessage = (messageId: String): void => {
+    const { paxos } = this.state;
+    paxos.messagePool.dropMessage(messageId);
+    this.setState({
+      nodeStates: getNodeStates(paxos),
+    });
+  }
+
   render() {
     const nodeMessagesComponents = this.state.nodeStates.map((nodeState) =>
       <NodeMessagesComponent
@@ -83,6 +91,7 @@ export default class App extends React.Component<any, any> {
         nodeState={nodeState}
         initiatePaxos={this.initiatePaxos}
         deliverMessage={this.deliverMessage}
+        dropMessage={this.dropMessage}
       />
     );
     return (
