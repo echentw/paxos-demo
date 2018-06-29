@@ -9,49 +9,23 @@ import {
 } from './lib/message_types';
 
 import { MessageState } from './AppState';
+import MessageButtonsComponent from './MessageButtonsComponent';
+import MessageHeadersComponent from './MessageHeadersComponent';
 
-interface MessageComponentProps {
+
+interface ComponentProps {
   messageState: MessageState,
   deliverMessage: (messageId: string) => void;
   dropMessage: (messageId: string) => void;
 }
 
-const MessageHeadersComponent = ({ name, message }: { name: string, message: Message }) => {
-  const { proposalNumber, fromNodeId, toNodeId } = message.headers;
-  return (
-    <div className="message-header-component">
-      <div className="message-text">{name}</div>
-      <div className="message-text">PN {proposalNumber}</div>
-      <div className="message-text">from node #{fromNodeId}</div>
-    </div>
-  );
-};
 
-interface ButtonsComponentProps {
-  deliver: () => void;
-  drop: () => void;
-}
-
-const ButtonsComponent = (props: ButtonsComponentProps) => {
-  const { deliver, drop } = props;
-  return (
-    <div className="message-buttons-container">
-      <button className="message-deliver-button" onClick={deliver}>
-        Deliver
-      </button>
-      <button className="message-drop-button" onClick={drop}>
-        Drop
-      </button>
-    </div>
-  );
-};
-
-export default class MessageComponent extends React.Component<MessageComponentProps, {}> {
-  constructor(props: MessageComponentProps) {
+export default class MessageComponent extends React.Component<ComponentProps, {}> {
+  constructor(props: ComponentProps) {
     super(props);
   }
 
-  extractNameAndBodyTexts = (message: Message) => {
+  extractNameAndBodyTexts = (message: Message): { name: string, bodyTexts: string[] } => {
     let name;
     let bodyTexts;
     switch(message.kind) {
@@ -98,12 +72,12 @@ export default class MessageComponent extends React.Component<MessageComponentPr
     };
   }
 
-  deliverMessage = () => {
+  deliverMessage = (): void => {
     const { id } = this.props.messageState;
     this.props.deliverMessage(id);
   }
 
-  dropMessage = () => {
+  dropMessage = (): void => {
     const { id } = this.props.messageState;
     this.props.dropMessage(id);
   }
@@ -122,7 +96,7 @@ export default class MessageComponent extends React.Component<MessageComponentPr
           <MessageHeadersComponent name={name} message={message}/>
           {bodyTextComponents}
         </div>
-        <ButtonsComponent
+        <MessageButtonsComponent
           deliver={this.deliverMessage}
           drop={this.dropMessage}
         />

@@ -7,7 +7,7 @@ import Paxos from './lib/paxos';
 import { NodeState, ProposerState, ReceiverState, LearnerState } from './AppState';
 
 
-interface NodeComponentProps {
+interface ComponentProps {
   nodeState: NodeState;
   initiatePaxos: (nodeId: number, proposedValue: string) => void;
   paxos: Paxos;
@@ -71,8 +71,8 @@ const LearnerComponent = ({ learnerState }: { learnerState: LearnerState }) => {
   );
 };
 
-export default class NodeComponent extends React.Component<NodeComponentProps, {}> {
-  constructor(props: NodeComponentProps) {
+export default class NodeComponent extends React.Component<ComponentProps, {}> {
+  constructor(props: ComponentProps) {
     super(props);
   }
 
