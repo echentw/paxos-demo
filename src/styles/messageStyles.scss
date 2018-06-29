@@ -41,7 +41,7 @@
         width: 140px;
 
         border-radius: 2px;
-        background-color: tomato;
+        background-color: rgb(240, 190, 0);
 
         .message-text-container {
           flex: 1;
@@ -55,9 +55,9 @@
             flex: 1;
             @extend %button-base;
             @include button-colors(
-              rgb(0, 0, 255),
-              rgb(0, 0, 200),
-              rgb(0, 0, 150)
+              rgb(0, 0, 230),
+              rgb(0, 0, 170),
+              rgb(0, 0, 120)
             );
             font-size: 12px;
           }
@@ -66,9 +66,9 @@
             flex: 1;
             @extend %button-base;
             @include button-colors(
-              rgb(255, 0, 0),
-              rgb(200, 0, 0),
-              rgb(150, 0, 0)
+              rgb(220, 0, 0),
+              rgb(170, 0, 0),
+              rgb(120, 0, 0)
             );
             font-size: 12px;
           }

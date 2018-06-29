@@ -76,9 +76,9 @@
   .initiate-paxos-button {
     @extend %button-base;
     @include button-colors(
-      rgb(0, 200, 0),
-      rgb(0, 150, 0),
-      rgb(0, 100, 0)
+      rgb(0, 170, 0),
+      rgb(0, 130, 0),
+      rgb(0, 80, 0)
     );
     font-size: 14px;
   }
