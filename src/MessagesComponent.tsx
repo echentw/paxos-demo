@@ -30,8 +30,10 @@ export default class MessagesComponent extends React.Component<ComponentProps, {
     return (
       <div className="messages-outer-container">
         <div className="messages-label">Messages for Node #{nodeId}</div>
-        <div className="messages-inner-container">
-          {messageComponents}
+        <div className="messages-middle-container">
+          <div className="messages-inner-container">
+            {messageComponents}
+          </div>
         </div>
       </div>
     );
