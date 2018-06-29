@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { DropTarget } from 'react-dnd';
 
 import { Message } from './lib/message_types';
 import PaxosNode from './lib/paxos_node';
@@ -8,31 +7,10 @@ import Paxos from './lib/paxos';
 import { NodeState, ProposerState, ReceiverState, LearnerState } from './AppState';
 
 
-const nodeDropTarget = {
-  drop(props, monitor, component) {
-    return { success: true };
-  },
-
-  canDrop(props, monitor) {
-    const { id } = props.nodeState;
-    const { toNodeId } = monitor.getItem();
-    return toNodeId === id;
-  }
-}
-
-function collect(connect, monitor) {
-  return {
-    connectDropTarget: connect.dropTarget(),
-    isOver: monitor.isOver(),
-  };
-}
-
 interface NodeComponentProps {
   nodeState: NodeState;
   initiatePaxos: (nodeId: number, proposedValue: string) => void;
   paxos: Paxos;
-  connectDropTarget: Function,
-  isOver: boolean,
 }
 
 const ProposerComponent = ({ proposerState }: { proposerState: ProposerState }) => {
@@ -93,7 +71,7 @@ const LearnerComponent = ({ learnerState }: { learnerState: LearnerState }) => {
   );
 };
 
-class NodeComponent extends React.Component<NodeComponentProps, {}> {
+export default class NodeComponent extends React.Component<NodeComponentProps, {}> {
   constructor(props: NodeComponentProps) {
     super(props);
   }
@@ -103,13 +81,12 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
   }
 
   render() {
-    const { connectDropTarget, isOver, nodeState } = this.props;
+    const { nodeState } = this.props;
 
     const { id, proposer, receiver, learner } = nodeState;
 
-    const classes = isOver ? 'node-component is-over' : 'node-component';
-    return connectDropTarget(
-      <div className={classes}>
+    return (
+      <div className="node-component">
         <div className="node-label">
           Node #{id}
         </div>
@@ -127,5 +104,3 @@ class NodeComponent extends React.Component<NodeComponentProps, {}> {
     );
   }
 }
-
-export default DropTarget('message', nodeDropTarget, collect)(NodeComponent);

@@ -71,10 +71,6 @@
 
         border: 4px solid lightgrey;
 
-        &.is-over {
-          border-color: black;
-        }
-
         .node-label {
           margin-bottom: 4px;
         }
@@ -151,11 +147,9 @@
           padding: 4px;
           height: 110px;
           width: 140px;
-          background-color: tomato;
 
-          &.is-dragging {
-            opacity: 0.0;
-          }
+          border-radius: 2px;
+          background-color: tomato;
 
           .message-text-container {
             flex: 1;

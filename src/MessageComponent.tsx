@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { DragSource } from 'react-dnd';
 
 import {
   Message,
@@ -11,33 +10,9 @@ import {
 
 import { MessageState } from './AppState';
 
-const messageDragSource = {
-  beginDrag(props) {
-    return {
-      messageId: props.messageState.id,
-      toNodeId: props.messageState.message.headers.toNodeId,
-    };
-  },
-
-  endDrag(props, monitor) {
-    if (monitor.getDropResult()) {
-      props.deliverMessage(props.messageState.id);
-    }
-  }
-};
-
-function collect(connect, monitor) {
-  return {
-    connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging(),
-  };
-}
-
 interface MessageComponentProps {
   messageState: MessageState,
   deliverMessage: (messageId: String) => void;
-  connectDragSource: Function,
-  isDragging: boolean,
 }
 
 const MessageHeadersComponent = ({ name, message }: { name: string, message: Message }) => {
@@ -70,16 +45,14 @@ const ButtonsComponent = (props: ButtonsComponentProps) => {
   );
 };
 
-class MessageComponent extends React.Component<MessageComponentProps, {}> {
+export default class MessageComponent extends React.Component<MessageComponentProps, {}> {
   constructor(props: MessageComponentProps) {
     super(props);
   }
 
   render() {
-    const { connectDragSource, isDragging, messageState, deliverMessage } = this.props;
+    const { messageState, deliverMessage } = this.props;
     const { id, message } = messageState;
-
-    const classes = isDragging ? 'message-container is-dragging' : 'message-container';
 
     let name;
     let bodyTexts;
@@ -124,8 +97,8 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
 
     const bodyTextComponents = bodyTexts.map((text) => <div className="message-text">{text}</div>);
 
-    const component = (
-      <div className={classes} id={id}>
+    return (
+      <div className="message-container" id={id}>
         <div className="message-text-container">
           <MessageHeadersComponent name={name} message={message}/>
           {bodyTextComponents}
@@ -136,9 +109,5 @@ class MessageComponent extends React.Component<MessageComponentProps, {}> {
         />
       </div>
     );
-
-    return connectDragSource(component);
   }
 }
-
-export default DragSource('message', messageDragSource, collect)(MessageComponent);

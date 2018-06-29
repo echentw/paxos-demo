@@ -1,8 +1,5 @@
 import * as React from 'react';
 
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
-
 import { Message } from './lib/message_types';
 import PaxosNode from './lib/paxos_node';
 import MessagePool from './lib/message_pool';
@@ -44,7 +41,7 @@ function getNodeStates(paxos: Paxos): Array<NodeState> {
   });
 }
 
-class App extends React.Component<any, any> {
+export default class App extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
     const paxos = new Paxos(5);
@@ -95,5 +92,3 @@ class App extends React.Component<any, any> {
     );
   }
 }
-
-export default DragDropContext(HTML5Backend)(App);
