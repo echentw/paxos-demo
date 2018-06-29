@@ -97,7 +97,7 @@ export default class NodeComponent extends React.Component<ComponentProps, {}> {
             <LearnerComponent learnerState={learner}/>
           </div>
         </div>
-        <button className="button" onClick={this.handleClick}>
+        <button className="initiate-paxos-button" onClick={this.handleClick}>
           Initiate Paxos
         </button>
       </div>

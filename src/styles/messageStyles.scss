@@ -1,0 +1,85 @@
+@import './buttonUtils';
+
+.app-container {
+.node-messages-container {
+
+.messages-outer-container {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  background-color: lightgreen;
+  border: 1px solid black;
+  overflow: hidden;
+
+  .messages-label {
+    margin-left: 10px;
+  }
+
+  .messages-middle-container {
+    flex: 1;
+
+    display: flex;
+
+    width: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    .messages-inner-container {
+      display: flex;
+      flex-direction: row;
+
+      .message-container {
+        display: flex;
+        flex-direction: column;
+
+        margin: 10px;
+        padding: 4px;
+        height: 110px;
+        width: 140px;
+
+        border-radius: 2px;
+        background-color: tomato;
+
+        .message-text-container {
+          flex: 1;
+        }
+
+        .message-buttons-container {
+          display: flex;
+          flex-direction: row;
+
+          .message-deliver-button {
+            flex: 1;
+            @extend %button-base;
+            @include button-colors(
+              rgb(0, 0, 255),
+              rgb(0, 0, 200),
+              rgb(0, 0, 150)
+            );
+            font-size: 12px;
+          }
+
+          .message-drop-button {
+            flex: 1;
+            @extend %button-base;
+            @include button-colors(
+              rgb(255, 0, 0),
+              rgb(200, 0, 0),
+              rgb(150, 0, 0)
+            );
+            font-size: 12px;
+          }
+        }
+
+        .message-text {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+}}

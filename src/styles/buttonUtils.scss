@@ -1,0 +1,19 @@
+@mixin button-colors($color, $hover-color, $active-color) {
+  background-color: $color;
+  &:hover {
+    background-color: $hover-color;
+  }
+  &:active {
+    background-color: $active-color;
+  }
+}
+
+%button-base {
+  border: none;
+  color: white;
+  text-align: center;
+
+  &:focus {
+    outline: 0;
+  }
+}
