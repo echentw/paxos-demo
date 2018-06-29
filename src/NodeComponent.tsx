@@ -19,7 +19,7 @@ const ProposerComponent = ({ proposerState }: { proposerState: ProposerState }) 
     return (
       <div className="proposer-component">
         <div className="node-text">
-          PN #{proposalNumber}
+          PN: {proposalNumber}
         </div>
         <div className="node-text">
           PV: {proposedValue}
@@ -48,7 +48,7 @@ const ReceiverComponent = ({ receiverState }: { receiverState: ReceiverState }) 
   return (
     <div className="receiver-component">
       <div className="node-text">
-        promised PN #{receiverState.highestSeenProposalNumber}
+        promised PN: {receiverState.highestSeenProposalNumber}
       </div>
       <div className="node-text">
         accepted: {receiverState.acceptedValue}
@@ -65,7 +65,7 @@ const LearnerComponent = ({ learnerState }: { learnerState: LearnerState }) => {
         responses: {learnerState.responses}
       </div>
       <div className="node-text">
-        learned value: {learnerState.learnedValue}
+        LV: {learnerState.learnedValue}
       </div>
     </div>
   );

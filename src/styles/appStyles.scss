@@ -2,19 +2,27 @@
 @import './messageStyles';
 
 * {
+  font-family: 'Times New Roman';
+}
+
+* {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  height: 6px;
-}
+// This makes the scrollbar always visible.
+* {
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 8px;
+    height: 6px;
+  }
 
-::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background-color: rgba(0, 0, 0, 0.5);
+  ::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
 }
 
 .app-container {
