@@ -44,11 +44,20 @@
       $role-padding: 4px;
       $role-margin: 1px;
 
+      %role-text-wrap {
+        white-space: nowrap;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        text-overflow: ellipsis;
+      }
+
       .proposer-component {
         flex: 1;
         padding: $role-padding;
         background-color: pink;
         margin: $role-margin;
+
+        @extend %role-text-wrap;
       }
 
       .receiver-learner-container {
@@ -56,11 +65,17 @@
         display: flex;
         flex-direction: column;
 
+        // Oddly enough, this is required for flex-box and overflow to play nicely.
+        // https://css-tricks.com/flexbox-truncated-text/
+        min-width: 0;
+
         .receiver-component {
           flex: 1;
           padding: $role-padding;
           background-color: lightgreen;
           margin: $role-margin;
+
+          @extend %role-text-wrap;
         }
 
         .learner-component {
@@ -68,6 +83,8 @@
           padding: $role-padding;
           background-color: yellow;
           margin: $role-margin;
+
+          @extend %role-text-wrap;
         }
       }
     }
