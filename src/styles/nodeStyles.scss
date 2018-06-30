@@ -8,6 +8,8 @@
   flex-direction: column;
   align-items: center;
 
+  position: relative;
+
   background-color: lightblue;
 
   .node-component {
@@ -98,6 +100,58 @@
       rgb(0, 80, 0)
     );
     font-size: 14px;
+  }
+
+  .proposal-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+
+    position: absolute;
+    left: 25%;
+    top: 25%;
+    width: 50%;
+    height: 50%;
+
+    box-shadow: 4px 4px 10px;
+
+    background-color: rgb(180, 180, 250);
+
+    .proposal-input {
+      padding: 4px;
+      border: 1px solid white;
+      border-radius: 2px;
+      &:focus {
+        outline: 0;
+      }
+    }
+
+    .proposal-buttons-container {
+      .propose-button {
+        @extend %button-base;
+        @include button-colors(
+          rgb(0, 170, 0),
+          rgb(0, 130, 0),
+          rgb(0, 80, 0)
+        );
+        margin: 2px;
+        font-size: 12px;
+        width: 80px;
+      }
+
+      .cancel-button {
+        @extend %button-base;
+        @include button-colors(
+          rgb(150, 150, 150),
+          rgb(130, 130, 130),
+          rgb(80, 80, 80)
+        );
+        margin: 2px;
+        font-size: 12px;
+        width: 80px;
+      }
+    }
   }
 }
 

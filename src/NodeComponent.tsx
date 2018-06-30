@@ -13,6 +13,11 @@ interface ComponentProps {
   paxos: Paxos;
 }
 
+interface ComponentState {
+  isDraftingProposal: boolean;
+  valueToPropose: string;
+}
+
 const ProposerComponent = ({ proposerState }: { proposerState: ProposerState }) => {
   const { isProposing, proposalNumber, proposedValue, responses, phase } = proposerState;
   if (isProposing) {
@@ -71,19 +76,62 @@ const LearnerComponent = ({ learnerState }: { learnerState: LearnerState }) => {
   );
 };
 
-export default class NodeComponent extends React.Component<ComponentProps, {}> {
+export default class NodeComponent extends React.Component<ComponentProps, ComponentState> {
   constructor(props: ComponentProps) {
     super(props);
+
+    this.state = {
+      isDraftingProposal: false,
+      valueToPropose: '',
+    };
   }
 
   handleClick = () => {
-    this.props.initiatePaxos(this.props.nodeState.id, 'cereal');
+    this.setState({
+      isDraftingProposal: true,
+      valueToPropose: '',
+    });
+  }
+
+  handleChange = (event) => this.setState({ valueToPropose: event.target.value });
+
+  handlePropose = (event) => {
+    event.preventDefault();
+    if (this.state.valueToPropose.length > 0) {
+      this.props.initiatePaxos(this.props.nodeState.id, this.state.valueToPropose);
+      this.setState({ isDraftingProposal: false });
+    }
+  }
+
+  handleCancel = (event) => {
+    event.preventDefault();
+    this.setState({ isDraftingProposal: false });
   }
 
   render() {
     const { nodeState } = this.props;
 
     const { id, proposer, receiver, learner } = nodeState;
+
+    const proposalComponent = this.state.isDraftingProposal ? (
+      <form className="proposal-modal">
+        <div>Enter a value to propose</div>
+        <input
+          className="proposal-input"
+          type="text"
+          value={this.state.valueToPropose}
+          onChange={this.handleChange}
+        />
+        <div className="proposal-buttons-container">
+          <button className="propose-button" onClick={this.handlePropose}>Propose</button>
+          <button className="cancel-button" onClick={this.handleCancel}>Cancel</button>
+        </div>
+      </form>
+    ) : (
+      <button className="initiate-paxos-button" onClick={this.handleClick}>
+        Initiate Paxos
+      </button>
+    );
 
     return (
       <div className="node-component">
@@ -97,9 +145,7 @@ export default class NodeComponent extends React.Component<ComponentProps, {}> {
             <LearnerComponent learnerState={learner}/>
           </div>
         </div>
-        <button className="initiate-paxos-button" onClick={this.handleClick}>
-          Initiate Paxos
-        </button>
+        {proposalComponent}
       </div>
     );
   }
