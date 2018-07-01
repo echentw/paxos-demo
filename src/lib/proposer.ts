@@ -30,9 +30,9 @@ export default class Proposer extends PaxosRole {
   }
 
   generatePrepareRequests(value: string, proposalNumberToBeat: number): Array<PrepareRequest> {
+    this.reset();
     this.proposalNumber = this.getNewProposalNumber(proposalNumberToBeat);
     this.proposedValue = value;
-    this.responses = [];
     this.isProposing = true;
 
     return this.receiverNodeIds
