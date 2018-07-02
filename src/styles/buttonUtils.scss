@@ -12,8 +12,11 @@
   border: none;
   color: white;
   text-align: center;
-
   &:focus {
     outline: 0;
+  }
+  &:disabled {
+    color: rgb(20, 20, 20);
+    background-color: rgb(100, 100, 100);
   }
 }

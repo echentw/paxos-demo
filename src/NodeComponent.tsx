@@ -5,17 +5,16 @@ import PaxosNode from './lib/paxos_node';
 import Paxos from './lib/paxos';
 
 import { NodeState, ProposerState, ReceiverState, LearnerState } from './AppState';
+import ProposalModalComponent from './ProposalModalComponent';
 
 
 interface ComponentProps {
   nodeState: NodeState;
   initiatePaxos: (nodeId: number, proposedValue: string) => void;
+  beginDraftingProposal: (nodeId: number) => void;
+  endDraftingProposal: () => void;
+  nodeIdDraftingProposal: number;
   paxos: Paxos;
-}
-
-interface ComponentState {
-  isDraftingProposal: boolean;
-  valueToPropose: string;
 }
 
 const ProposerComponent = ({ proposerState }: { proposerState: ProposerState }) => {
@@ -76,62 +75,19 @@ const LearnerComponent = ({ learnerState }: { learnerState: LearnerState }) => {
   );
 };
 
-export default class NodeComponent extends React.Component<ComponentProps, ComponentState> {
+export default class NodeComponent extends React.Component<ComponentProps, {}> {
   constructor(props: ComponentProps) {
     super(props);
-
-    this.state = {
-      isDraftingProposal: false,
-      valueToPropose: '',
-    };
   }
 
   handleClick = () => {
-    this.setState({
-      isDraftingProposal: true,
-      valueToPropose: '',
-    });
-  }
-
-  handleChange = (event) => this.setState({ valueToPropose: event.target.value });
-
-  handlePropose = (event) => {
-    event.preventDefault();
-    if (this.state.valueToPropose.length > 0) {
-      this.props.initiatePaxos(this.props.nodeState.id, this.state.valueToPropose);
-      this.setState({ isDraftingProposal: false });
-    }
-  }
-
-  handleCancel = (event) => {
-    event.preventDefault();
-    this.setState({ isDraftingProposal: false });
+    this.props.beginDraftingProposal(this.props.nodeState.id);
   }
 
   render() {
     const { nodeState } = this.props;
 
     const { id, proposer, receiver, learner } = nodeState;
-
-    const proposalComponent = this.state.isDraftingProposal ? (
-      <form className="proposal-modal">
-        <div>Enter a value to propose</div>
-        <input
-          className="proposal-input"
-          type="text"
-          value={this.state.valueToPropose}
-          onChange={this.handleChange}
-        />
-        <div className="proposal-buttons-container">
-          <button className="propose-button" onClick={this.handlePropose}>Propose</button>
-          <button className="cancel-button" onClick={this.handleCancel}>Cancel</button>
-        </div>
-      </form>
-    ) : (
-      <button className="initiate-paxos-button" onClick={this.handleClick}>
-        Initiate Paxos
-      </button>
-    );
 
     return (
       <div className="node-component">
@@ -145,7 +101,20 @@ export default class NodeComponent extends React.Component<ComponentProps, Compo
             <LearnerComponent learnerState={learner}/>
           </div>
         </div>
-        {proposalComponent}
+        <button
+          className="initiate-paxos-button"
+          onClick={this.handleClick}
+          disabled={this.props.nodeIdDraftingProposal !== -1}
+        >
+          Initiate Paxos
+        </button>
+        {this.props.nodeIdDraftingProposal === nodeState.id &&
+          <ProposalModalComponent
+            nodeState={this.props.nodeState}
+            initiatePaxos={this.props.initiatePaxos}
+            endDraftingProposal={this.props.endDraftingProposal}
+          />
+        }
       </div>
     );
   }

@@ -13,6 +13,9 @@ interface ComponentProps {
   initiatePaxos: (nodeId: number, proposedValue: string) => void;
   deliverMessage: (messageId: string) => void;
   dropMessage: (messageId: string) => void;
+  beginDraftingProposal: (nodeId: number) => void;
+  endDraftingProposal: () => void;
+  nodeIdDraftingProposal: number;
 }
 
 export default class NodeMessagesComponent extends React.Component<ComponentProps, {}> {
@@ -28,6 +31,9 @@ export default class NodeMessagesComponent extends React.Component<ComponentProp
           <NodeComponent
             nodeState={nodeState}
             initiatePaxos={this.props.initiatePaxos}
+            beginDraftingProposal={this.props.beginDraftingProposal}
+            endDraftingProposal={this.props.endDraftingProposal}
+            nodeIdDraftingProposal={this.props.nodeIdDraftingProposal}
             paxos={this.props.paxos}
           />
         </div>

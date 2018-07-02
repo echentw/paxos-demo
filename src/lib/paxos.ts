@@ -5,7 +5,7 @@ export default class Paxos {
   public messagePool: MessagePool;
   public nodes: Array<PaxosNode>;
 
-  getNodeById(id: number) {
+  getNodeById(id: number): PaxosNode | undefined {
     return this.nodes.find((node) => node.getId() === id);
   }
 
