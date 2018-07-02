@@ -42,6 +42,7 @@ export default class ProposalModalComponent extends React.Component<ComponentPro
         <input
           className="proposal-input"
           type="text"
+          autoFocus
           value={this.state.valueToPropose}
           onChange={this.handleChange}
         />
