@@ -1,4 +1,5 @@
 @import './buttonUtils';
+@import './animista/slideIn';
 
 .app-container {
 .node-messages-container {
@@ -32,6 +33,8 @@
       flex-direction: row;
 
       .message-container {
+        @extend %slide-in-top;
+
         display: flex;
         flex-direction: column;
 

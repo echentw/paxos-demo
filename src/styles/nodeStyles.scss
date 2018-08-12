@@ -1,4 +1,5 @@
 @import './buttonUtils';
+@import './animista/fadeIn.scss';
 
 .app-container {
 .node-messages-container {
@@ -103,6 +104,8 @@
   }
 
   .proposal-modal {
+    @extend %fade-in;
+
     display: flex;
     flex-direction: column;
     align-items: center;
