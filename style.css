@@ -1,0 +1,80 @@
+#root-label {
+  margin-top: 50px;
+}
+
+#root {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.answer {
+  margin-left: 50px;
+}
+
+.container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: rgb(20, 20, 20);
+  }
+
+  h1, h2, h3, h4, p, ul, li {
+    color: rgb(200, 200, 200);
+  }
+}
+
+
+
+
+
+
+/* Stolen from bootstrap's source */
+
+@media (min-width:576px) {
+    .container {
+    max-width: 540px;
+}
+}@media (min-width:768px) {
+    .container {
+    max-width: 720px;
+}
+}@media (min-width:992px) {
+    .container {
+    max-width: 960px;
+}
+}@media (min-width:1200px) {
+    .container {
+    max-width: 1140px;
+}
+}.container-fluid, .container-lg, .container-md, .container-sm, .container-xl {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+@media (min-width:576px) {
+    .container, .container-sm {
+    max-width: 540px;
+}
+}@media (min-width:768px) {
+    .container, .container-md, .container-sm {
+    max-width: 720px;
+}
+}@media (min-width:992px) {
+    .container, .container-lg, .container-md, .container-sm {
+    max-width: 960px;
+}
+}@media (min-width:1200px) {
+    .container, .container-lg, .container-md, .container-sm, .container-xl {
+    max-width: 1140px;
+}
+
+

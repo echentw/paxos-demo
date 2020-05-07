@@ -47,7 +47,7 @@ export default class MessageComponent extends React.Component<ComponentProps, {}
       case 'AcceptRequest': {
         const request = message as AcceptRequest;
         const { proposedValue } = request.body;
-        name = 'Accepted Request';
+        name = 'Accept Request';
         bodyTexts = [`PV: ${proposedValue}`];
         break;
       }

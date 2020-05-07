@@ -1,9 +1,73 @@
 <html>
   <header>
     <title>Paxos Demo</title>
+    <link rel="stylesheet" href="style.css"/>
   </header>
   <body>
+    <div class="container">
+      <h1>Paxos Demo</h1>
+      <p>This Paxos demo is intended for learning purposes. This Paxos cluster has 5 nodes, which only has the capability to write one value once, and all subsequent queries must be reads. Figuring out how to extend the algorithm to support storing multiple key-value pairs, override an existing value, and other features are left as an exercise to the reader. This implementation is based on the algorithm described in the <a href="https://lamport.azurewebsites.net/pubs/paxos-simple.pdf">Paxos Made Simple</a> paper.</p>
+
+      <h2>How to use</h2>
+      <p>The cluster starts uninitialized with no value. To begin the process of writing a value to the cluster, click the "Initiate Paxos" button on any of the 5 nodes. Think of this as you sending a request to that particular node to write a value.</p>
+
+      <h2>Nodes</h2>
+      <p>Each node is made up of 3 components: the Proposer, the Receiver, and the Learner.</p>
+
+      <h4>Proposer</h4>
+      <p>The proposer is the initiator of writes. It proposes a value for itself and other nodes in the cluster to accept. When you send a node a write request, a proposer state gets initialized (in pink). Then, the proposer sends a request to each of the other nodes in the cluster. The proposer state is composed of the following parts:</p>
+      <ul>
+        <li>PN (proposal number): the "id" associated with the write/proposal request. Higher ids take precedence over lower ids.</li>
+        <li>PV (proposed value): the value that is being proposed.</li>
+        <li>responses: how many responses the proposer has received from its proposal request. The proposer needs at least a majority of all nodes to accept its proposal request (so, itself and 2 of the other 4 nodes).</li>
+        <li>phase: the current phase of the Paxos algorithm the proposer is in. There are 2 phases: the Prepare phase and the Accept phase.</li>
+      </ul>
+
+      <h4>Receiver</h4>
+      <p>The receiver is responsible for handling proposer requests. The receiver state (in green) is composed of the following parts:</p>
+      <ul>
+        <li>promised PN (promised proposal number): the "id" that the receiver has promised to honor. The receiver will always honor the request with higher proposal number.</li>
+        <li>accepted: the value that the receiver has accepted. When a node (learner) learns that a majority of the nodes (receivers) have accepted a certain value, then the node (learner) is certain that the value is the cluster's value.</li>
+      </ul>
+
+      <h4>Learner</h4>
+      <p>The learner's job is to read the value from the cluster. The learner state (in yellow) is composed of the following parts:</p>
+      <ul>
+        <li>responses: how many responses the learner has received. The learner needs a majority of nodes to respond before making a judgement on what the cluster's value is.</li>
+        <li>LV (learned value): what the node thinks the cluster's value is (and the node will always be correct, assuming there are no bugs)</li>
+      </ul>
+
+      <h2>Messages</h2>
+      <p>When a node sends a message/request to other nodes, you'll see messages appear to the right of the nodes. These are "in-flight" messages (haven't reached the target node yet). You can choose to either deliver the message, or drop the message to simulate a network error.</p>
+    </div>
+
+    <div id="root-label" class="container">
+      <h1>DEMO:</h1>
+    </div>
+
     <div id="root"></div>
+
+    <div class="container">
+      <h1>Legend</h1>
+      <h2>Colors (for nodes)</h2>
+      <ul>
+        <li>Pink = proposer</li>
+        <li>Green = receiver</li>
+        <li>Yellow = learner</li>
+      </ul>
+      <h2>Abbreviations</h2>
+      <ul>
+        <li>PN = Proposal Number</li>
+        <li>PV = Proposed Value</li>
+        <li>LV = Learned Value</li>
+      </ul>
+
+      <h1>FAQs</h1>
+      <p><strong>Why does the proposer node instantly receive 1 response even though I haven't "delivered" any messages yet?</strong></p>
+      <p class="answer">The proposer node automatically receives the message that it sends itself!</p>
+      <p><strong>After I successfully wrote a value, why does writing another value not work?</strong></p>
+      <p class="answer">It's not supposed to work. After you successfully write the first value, the cluster will stay consistent with that one value forever, and subsequent "writes" that you try to do are actually reads.</li>
+    </div>
 
     <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
