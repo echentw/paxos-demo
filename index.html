@@ -7,10 +7,11 @@
   <body>
     <div class="container">
       <h1>Paxos Demo</h1>
-      <p>This Paxos demo is intended for learning purposes. This Paxos cluster has 5 nodes, which only has the capability to write one value once, and all subsequent queries must be reads. Figuring out how to extend the algorithm to support storing multiple key-value pairs, override an existing value, and other features are left as an exercise to the reader. This implementation is based on the algorithm described in the <a href="https://lamport.azurewebsites.net/pubs/paxos-simple.pdf">Paxos Made Simple</a> paper.</p>
+      <p>This Paxos demo is intended for learning purposes. This Paxos cluster has 5 nodes, which only has the capability to write one value once, and all subsequent queries must be reads. Figuring out how to extend the algorithm to support storing multiple key-value pairs, override an existing value, and other features are left as an exercise to the reader. This implementation is based on the algorithm described in the <a href="https://lamport.azurewebsites.net/pubs/paxos-simple.pdf">Paxos Made Simple</a> paper. The source code for this project can be found <a href="https://github.com/echentw/paxos-demo">here</a>.</p>
 
       <h2>How to use</h2>
       <p>The cluster starts uninitialized with no value. To begin the process of writing a value to the cluster, click the "Initiate Paxos" button on any of the 5 nodes. Think of this as you sending a request to that particular node to write a value.</p>
+      <p>The algorithm is done when the node's learner component's LV (learned value) field is populated. After that, no more values can be successfully written, and any more writes you attempt to do will actually be the node reading the value from the cluster.</p>
 
       <h2>Nodes</h2>
       <p>Each node is made up of 3 components: the Proposer, the Receiver, and the Learner.</p>
@@ -68,7 +69,7 @@
       <h1>FAQs</h1>
       <p><strong>Why does the proposer node instantly receive 1 response even though I haven't "delivered" any messages yet?</strong></p>
       <p class="answer">The proposer node automatically receives the message that it sends itself!</p>
-      <p><strong>After I successfully wrote a value, why does writing another value not work?</strong></p>
+      <p><strong>After I successfully write a value, why does writing another value not work?</strong></p>
       <p class="answer">It's not supposed to work. After you successfully write the first value, the cluster will stay consistent with that one value forever, and subsequent "writes" that you try to do are actually reads.</li>
     </div>
 
